@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import ruTranslations from "../i18n/ru.json";
 import kyTranslations from "../i18n/ky.json";
@@ -27,6 +28,8 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     localStorage.setItem("language", language);
+    // Update document language for accessibility
+    document.documentElement.lang = language;
   }, [language]);
 
   // Function to get a nested translation by key path (e.g., "nav.home")

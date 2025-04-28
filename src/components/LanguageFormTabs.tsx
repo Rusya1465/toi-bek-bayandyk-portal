@@ -2,6 +2,7 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { ReactNode } from "react";
+import { Globe } from "lucide-react";
 
 interface LanguageFormTabsProps {
   mainContent: ReactNode;
@@ -24,7 +25,8 @@ export const LanguageFormTabs = ({
   return (
     <div className="space-y-2">
       {description && (
-        <div className="text-sm text-muted-foreground mb-2">
+        <div className="text-sm text-muted-foreground mb-2 flex items-center">
+          <Globe className="h-4 w-4 mr-2" />
           {description}
         </div>
       )}

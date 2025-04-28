@@ -3,42 +3,45 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 const HomePage = () => {
+  const { t } = useTranslation();
+  
   const services = [
     {
-      title: "Жайлар",
-      description: "Ресторандар, банкеттик залдар",
+      title: t("home.services.venues.title"),
+      description: t("home.services.venues.description"),
       image: "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
     },
     {
-      title: "Артисттер",
-      description: "Ырчылар, алып баруучулар, музыкалык группалар",
+      title: t("home.services.artists.title"),
+      description: t("home.services.artists.description"),
       image: "https://images.unsplash.com/photo-1501612780327-45045538702b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
     },
     {
-      title: "Ижара",
-      description: "Майрам үчүн жабдуулар",
+      title: t("home.services.rentals.title"),
+      description: t("home.services.rentals.description"),
       image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
     },
   ];
 
   const benefits = [
     {
-      title: "Бардык керектүү нерселер бир жерде",
-      description: "Майрамды уюштуруу үчүн керектүү бардык нерселерди биздин платформадан табасыз.",
+      title: t("home.benefits.allinone.title"),
+      description: t("home.benefits.allinone.description"),
     },
     {
-      title: "Убакытты үнөмдөө",
-      description: "Майрам уюштуруу үчүн сапарларга убакыт коротпоңуз, баары онлайн.",
+      title: t("home.benefits.timesaving.title"),
+      description: t("home.benefits.timesaving.description"),
     },
     {
-      title: "Ыңгайлуу тандоо",
-      description: "Көптөгөн варианттарды салыштырып, өзүңүзгө эң ыңгайлуусун тандаңыз.",
+      title: t("home.benefits.convenient.title"),
+      description: t("home.benefits.convenient.description"),
     },
     {
-      title: "Ишенимдүү өнөктөштөр",
-      description: "Биз менен кызматташкан өнөктөштөр - өз ишинин адистери.",
+      title: t("home.benefits.trusted.title"),
+      description: t("home.benefits.trusted.description"),
     },
   ];
 
@@ -49,15 +52,15 @@ const HomePage = () => {
         <div className="container px-4 py-16 md:py-24 flex flex-col items-center text-center">
           <div className="w-full max-w-xl mx-auto space-y-4">
             <h1 className="text-3xl md:text-5xl font-bold tracking-tighter">
-              Сиздин майрамыңыз - <span className="text-kyrgyz-red">Биздин майрамыбыз</span>
+              {t("home.hero.title")} - <span className="text-kyrgyz-red">{t("home.hero.subtitle")}</span>
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl">
-              Кыргыз маданиятын сактоо менен заманбап майрамдарды уюштурабыз
+              {t("home.hero.description")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" asChild>
                 <Link to="/catalog">
-                  Каталогго өтүү
+                  {t("home.hero.catalogButton")}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -72,10 +75,10 @@ const HomePage = () => {
         <div className="container px-4">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-4xl font-bold tracking-tighter mb-4">
-              Биздин кызматтар
+              {t("home.servicesSection.title")}
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Биз сиздин майрамыңыз үчүн керектүү бардык нерселерди сунуштайбыз
+              {t("home.servicesSection.description")}
             </p>
           </div>
 
@@ -106,7 +109,7 @@ const HomePage = () => {
           <div className="text-center mt-10">
             <Button variant="outline" size="lg" asChild>
               <Link to="/catalog">
-                Бардык кызматтарды көрүү
+                {t("home.servicesSection.viewAllButton")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -119,10 +122,10 @@ const HomePage = () => {
         <div className="container px-4">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-4xl font-bold tracking-tighter mb-4">
-              Эмне үчүн биз?
+              {t("home.benefitsSection.title")}
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              ToiBek менен майрамды уюштуруу жеңил жана ыңгайлуу
+              {t("home.benefitsSection.description")}
             </p>
           </div>
 
@@ -144,14 +147,14 @@ const HomePage = () => {
         <div className="container px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl md:text-4xl font-bold tracking-tighter mb-4">
-              Майрамыңызды бирге уюштуралы!
+              {t("home.cta.title")}
             </h2>
             <p className="text-muted-foreground text-lg mb-8">
-              Биринчи кадамды жасаңыз - ToiBek сизге майрамды уюштурууга жардам берет.
+              {t("home.cta.description")}
             </p>
             <Button size="lg" asChild>
               <Link to="/catalog">
-                Каталогго өтүү
+                {t("home.cta.button")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

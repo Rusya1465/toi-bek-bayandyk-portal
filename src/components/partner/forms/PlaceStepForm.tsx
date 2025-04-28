@@ -17,24 +17,30 @@ import { ContactsStep } from "../step-forms/ContactsStep";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import { LanguageFormTabs } from "@/components/LanguageFormTabs";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
-// Define schema
+// Define schema with both languages
 const placeSchema = z.object({
-  name: z.string().min(2, "Жайдын аты эң аз дегенде 2 белги болушу керек"),
+  name: z.string().min(2, "Название должно содержать минимум 2 символа"),
   name_ru: z.string().optional(),
-  description: z.string().optional(),
-  description_ru: z.string().optional(),
-  address: z.string().min(5, "Толук дарек киргизиңиз"),
+  name_kg: z.string().optional(),
+  address: z.string().optional(),
   address_ru: z.string().optional(),
+  address_kg: z.string().optional(),
   capacity: z.string().optional(),
   capacity_ru: z.string().optional(),
+  capacity_kg: z.string().optional(),
+  description: z.string().optional(),
+  description_ru: z.string().optional(),
+  description_kg: z.string().optional(),
   price: z.string().optional(),
   price_ru: z.string().optional(),
+  price_kg: z.string().optional(),
   contacts: z.string().optional(),
   contacts_ru: z.string().optional(),
+  contacts_kg: z.string().optional(),
 });
 
 export type PlaceFormData = z.infer<typeof placeSchema>;
@@ -60,16 +66,22 @@ export const PlaceStepForm = ({ initialData, isEditing = false }: PlaceFormProps
     defaultValues: {
       name: initialData?.name || "",
       name_ru: initialData?.name_ru || "",
-      description: initialData?.description || "",
-      description_ru: initialData?.description_ru || "",
+      name_kg: initialData?.name_kg || "",
       address: initialData?.address || "",
       address_ru: initialData?.address_ru || "",
+      address_kg: initialData?.address_kg || "",
       capacity: initialData?.capacity || "",
       capacity_ru: initialData?.capacity_ru || "",
+      capacity_kg: initialData?.capacity_kg || "",
+      description: initialData?.description || "",
+      description_ru: initialData?.description_ru || "",
+      description_kg: initialData?.description_kg || "",
       price: initialData?.price || "",
       price_ru: initialData?.price_ru || "",
+      price_kg: initialData?.price_kg || "",
       contacts: initialData?.contacts || "",
       contacts_ru: initialData?.contacts_ru || "",
+      contacts_kg: initialData?.contacts_kg || "",
     },
   });
 
@@ -94,7 +106,6 @@ export const PlaceStepForm = ({ initialData, isEditing = false }: PlaceFormProps
 
   // Watch fields for validation
   const watchName = form.watch("name");
-  const watchAddress = form.watch("address");
 
   // Initialize imageUrl with initial data
   useEffect(() => {
@@ -130,18 +141,11 @@ export const PlaceStepForm = ({ initialData, isEditing = false }: PlaceFormProps
         }
       }
 
-      // Copy the main language fields to the alternate language fields if they're empty
-      const altLanguage = language === "ky" ? "ru" : "kg";
-      if (!data[`name_${altLanguage}`]) {
-        data[`name_${altLanguage}`] = data.name;
-      }
-      // Same for other fields...
-
       const placeData = {
         ...data,
+        name: data.name, // Ensure name is explicitly set and not optional
         image_url: finalImageUrl,
         owner_id: user.id,
-        name: data.name, // Ensure name is explicitly set and not optional
       };
 
       if (isEditing) {
@@ -184,233 +188,285 @@ export const PlaceStepForm = ({ initialData, isEditing = false }: PlaceFormProps
     }
   };
 
-  // Multilanguage form components
-  const renderNameFields = () => (
-    <FormField
-      control={form.control}
-      name="name"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.namePlace")}</FormLabel>
-          <FormControl>
-            <Input placeholder={t("services.fields.namePlaceholder")} {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
+  // Determine which language is alternate based on current language
+  const alternateLanguage = language === "ky" ? "ru" : "ky";
 
-  const renderNameFieldsRu = () => (
-    <FormField
-      control={form.control}
-      name="name_ru"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.namePlace")}</FormLabel>
-          <FormControl>
-            <Input placeholder={t("services.fields.namePlaceholder")} {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
+  // Define custom components for language tabs
+  const NameInput = () => {
+    const altLang = alternateLanguage;
+    const altLangField = `name_${altLang}` as "name_ru" | "name_kg";
+    
+    return (
+      <LanguageFormTabs
+        mainContent={
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.namePlace")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.namePlaceholder")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateContent={
+          <FormField
+            control={form.control}
+            name={altLangField}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.namePlace")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.namePlaceholder")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateLanguage={altLang}
+        description={t("services.language.form.description")}
+      />
+    );
+  };
 
-  const renderAddressFields = () => (
-    <FormField
-      control={form.control}
-      name="address"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.address")}</FormLabel>
-          <FormControl>
-            <Input placeholder={t("services.fields.addressPlace")} {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
+  const AddressInput = () => {
+    const altLang = alternateLanguage;
+    const altLangField = `address_${altLang}` as "address_ru" | "address_kg";
+    
+    return (
+      <LanguageFormTabs
+        mainContent={
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.address")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.addressPlace")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateContent={
+          <FormField
+            control={form.control}
+            name={altLangField}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.address")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.addressPlace")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateLanguage={altLang}
+      />
+    );
+  };
 
-  const renderAddressFieldsRu = () => (
-    <FormField
-      control={form.control}
-      name="address_ru"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.address")}</FormLabel>
-          <FormControl>
-            <Input placeholder={t("services.fields.addressPlace")} {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
+  const CapacityInput = () => {
+    const altLang = alternateLanguage;
+    const altLangField = `capacity_${altLang}` as "capacity_ru" | "capacity_kg";
+    
+    return (
+      <LanguageFormTabs
+        mainContent={
+          <FormField
+            control={form.control}
+            name="capacity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.capacity")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.capacityPlace")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateContent={
+          <FormField
+            control={form.control}
+            name={altLangField}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.capacity")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.capacityPlace")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateLanguage={altLang}
+      />
+    );
+  };
 
-  const renderCapacityFields = () => (
-    <FormField
-      control={form.control}
-      name="capacity"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.capacity")}</FormLabel>
-          <FormControl>
-            <Input placeholder={t("services.fields.capacityPlace")} {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
+  const DescriptionInputTab = () => {
+    const altLang = alternateLanguage;
+    const altLangField = `description_${altLang}` as "description_ru" | "description_kg";
+    
+    return (
+      <LanguageFormTabs
+        mainContent={
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.description")}</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder={t("services.fields.descriptionPlace")}
+                    className="min-h-[150px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateContent={
+          <FormField
+            control={form.control}
+            name={altLangField}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.description")}</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder={t("services.fields.descriptionPlace")}
+                    className="min-h-[150px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateLanguage={altLang}
+        description={t("services.language.form.description")}
+      />
+    );
+  };
+  
+  const PriceInput = () => {
+    const altLang = alternateLanguage;
+    const altLangField = `price_${altLang}` as "price_ru" | "price_kg";
+    
+    return (
+      <LanguageFormTabs
+        mainContent={
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.price")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.pricePlaceExample")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateContent={
+          <FormField
+            control={form.control}
+            name={altLangField}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.price")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.pricePlaceExample")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateLanguage={altLang}
+      />
+    );
+  };
 
-  const renderCapacityFieldsRu = () => (
-    <FormField
-      control={form.control}
-      name="capacity_ru"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.capacity")}</FormLabel>
-          <FormControl>
-            <Input placeholder={t("services.fields.capacityPlace")} {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-
-  const renderDescriptionFields = () => (
-    <FormField
-      control={form.control}
-      name="description"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.description")}</FormLabel>
-          <FormControl>
-            <Textarea
-              placeholder={t("services.fields.descriptionPlace")}
-              className="min-h-[200px]"
-              {...field}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-
-  const renderDescriptionFieldsRu = () => (
-    <FormField
-      control={form.control}
-      name="description_ru"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.description")}</FormLabel>
-          <FormControl>
-            <Textarea
-              placeholder={t("services.fields.descriptionPlace")}
-              className="min-h-[200px]"
-              {...field}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-
-  const renderPriceFields = () => (
-    <FormField
-      control={form.control}
-      name="price"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.price")}</FormLabel>
-          <FormControl>
-            <Input placeholder={t("services.fields.pricePlaceExample")} {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-
-  const renderPriceFieldsRu = () => (
-    <FormField
-      control={form.control}
-      name="price_ru"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.price")}</FormLabel>
-          <FormControl>
-            <Input placeholder={t("services.fields.pricePlaceExample")} {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-
-  const renderContactsFields = () => (
-    <FormField
-      control={form.control}
-      name="contacts"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.contacts")}</FormLabel>
-          <FormControl>
-            <Input placeholder={t("services.fields.contactsPlaceholder")} {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-
-  const renderContactsFieldsRu = () => (
-    <FormField
-      control={form.control}
-      name="contacts_ru"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{t("services.fields.contacts")}</FormLabel>
-          <FormControl>
-            <Input placeholder={t("services.fields.contactsPlaceholder")} {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
+  const ContactsInput = () => {
+    const altLang = alternateLanguage;
+    const altLangField = `contacts_${altLang}` as "contacts_ru" | "contacts_kg";
+    
+    return (
+      <LanguageFormTabs
+        mainContent={
+          <FormField
+            control={form.control}
+            name="contacts"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.contacts")}</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder={t("services.fields.contactsPlaceholder")}
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateContent={
+          <FormField
+            control={form.control}
+            name={altLangField}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.contacts")}</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder={t("services.fields.contactsPlaceholder")}
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateLanguage={altLang}
+      />
+    );
+  };
 
   // Define steps
   const steps = [
     {
       id: "basic-info",
       title: t("services.steps.basicInfo"),
-      isValid: !!watchName && !!watchAddress,
+      isValid: !!watchName,
       component: (
-        <div className="space-y-6">
-          <LanguageFormTabs
-            mainContent={renderNameFields()}
-            alternateContent={renderNameFieldsRu()}
-            alternateLanguage={language === "ky" ? "ru" : "ky"}
-            description={t("services.language.instructions")}
-          />
-          
-          <LanguageFormTabs
-            mainContent={renderAddressFields()}
-            alternateContent={renderAddressFieldsRu()}
-            alternateLanguage={language === "ky" ? "ru" : "ky"}
-          />
-          
-          <LanguageFormTabs
-            mainContent={renderCapacityFields()}
-            alternateContent={renderCapacityFieldsRu()}
-            alternateLanguage={language === "ky" ? "ru" : "ky"}
-          />
+        <div className="space-y-4">
+          <NameInput />
+          <AddressInput />
+          <CapacityInput />
         </div>
       )
     },
@@ -431,32 +487,16 @@ export const PlaceStepForm = ({ initialData, isEditing = false }: PlaceFormProps
       id: "description",
       title: t("services.steps.description"),
       isValid: true, // Description is optional
-      component: (
-        <LanguageFormTabs
-          mainContent={renderDescriptionFields()}
-          alternateContent={renderDescriptionFieldsRu()}
-          alternateLanguage={language === "ky" ? "ru" : "ky"}
-          description={t("services.language.instructions")}
-        />
-      )
+      component: <DescriptionInputTab />
     },
     {
       id: "contacts",
       title: t("services.steps.contacts"),
       isValid: true, // Contacts are optional
       component: (
-        <div className="space-y-6">
-          <LanguageFormTabs
-            mainContent={renderPriceFields()}
-            alternateContent={renderPriceFieldsRu()}
-            alternateLanguage={language === "ky" ? "ru" : "ky"}
-          />
-          
-          <LanguageFormTabs
-            mainContent={renderContactsFields()}
-            alternateContent={renderContactsFieldsRu()}
-            alternateLanguage={language === "ky" ? "ru" : "ky"}
-          />
+        <div className="space-y-4">
+          <PriceInput />
+          <ContactsInput />
         </div>
       )
     }
