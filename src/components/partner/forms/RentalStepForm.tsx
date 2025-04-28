@@ -170,6 +170,7 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
 
       const rentalData = {
         ...data,
+        name: data.name, // Ensure name is explicitly set and not optional
         image_url: finalImageUrl,
         owner_id: user.id,
       };

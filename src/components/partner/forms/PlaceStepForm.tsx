@@ -173,6 +173,7 @@ export const PlaceStepForm = ({ initialData, isEditing = false }: PlaceFormProps
 
       const placeData = {
         ...data,
+        name: data.name, // Ensure name is explicitly set and not optional
         image_url: finalImageUrl,
         owner_id: user.id,
       };

@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useTranslation } from "@/contexts/LanguageContext";
-import { Form } from "@/components/ui/form";
+import { Form, FormField } from "@/components/ui/form";
 import { Loader } from "lucide-react";
 import { StepForm } from "@/components/StepForm";
 import { BasicInfoStep } from "../step-forms/BasicInfoStep";
@@ -24,6 +24,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 // Define schema
 const artistSchema = z.object({
@@ -192,6 +193,7 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
 
       const artistData = {
         ...data,
+        name: data.name, // Ensure name is explicitly set and not optional
         image_url: finalImageUrl,
         owner_id: user.id,
       };
@@ -355,5 +357,3 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
     </Form>
   );
 };
-
-import { Input } from "@/components/ui/input";

@@ -46,11 +46,16 @@ export const uploadFileWithProgress = async (
     const fileName = `${uuidv4()}.${fileExt}`;
     const filePath = `${userId}/${fileName}`;
     
-    // Create upload options with progress tracking if handler provided
-    const options: { onUploadProgress?: (progress: { percent: number }) => void } = {};
+    // Use the correct type for upload options
+    const options = {
+      cacheControl: '3600',
+      upsert: false
+    } as const;
     
+    // Add onUploadProgress handler if provided
     if (onProgress) {
-      options.onUploadProgress = (progress: { percent: number }) => {
+      // Cast to any to work around TypeScript limitations
+      (options as any).onUploadProgress = (progress: { percent: number }) => {
         onProgress(progress.percent);
       };
     }
