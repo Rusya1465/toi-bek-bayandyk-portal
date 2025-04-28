@@ -28,18 +28,25 @@ export const useImageUpload = (bucketName: string = "places") => {
   const handleImageRemove = () => {
     setImageUrl(null);
     setImageFile(null);
+    setUploadProgress(0);
   };
 
   const uploadImage = async (): Promise<string | null> => {
     if (!user || !imageFile) return imageUrl;
     
     setUploading(true);
+    setUploadProgress(0);
+    
     try {
+      // Reset the progress state before starting the upload
       const finalImageUrl = await uploadFileWithProgress(
         imageFile,
         bucketName,
         user.id,
-        (progress) => setUploadProgress(progress)
+        (progress) => {
+          console.log(`Upload progress: ${progress}%`);
+          setUploadProgress(progress);
+        }
       );
       
       if (!finalImageUrl) {
@@ -50,12 +57,14 @@ export const useImageUpload = (bucketName: string = "places") => {
         return null;
       }
       
+      console.log("Upload complete, final URL:", finalImageUrl);
+      setImageUrl(finalImageUrl);
       return finalImageUrl;
     } catch (error) {
       console.error("Upload error:", error);
       toast({
         variant: "destructive",
-        description: "Error uploading image",
+        description: `Error uploading image: ${error instanceof Error ? error.message : 'Unknown error'}`,
       });
       return null;
     } finally {

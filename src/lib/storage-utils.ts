@@ -18,33 +18,50 @@ export const uploadFileWithProgress = async (
     const fileName = `${uuidv4()}.${fileExt}`;
     const filePath = `${userId}/${fileName}`;
     
+    console.log(`Starting file upload to ${bucketName}/${filePath}`);
+    
     // Use the correct type for upload options
-    const options = {
+    const options: {
+      cacheControl: string;
+      upsert: boolean;
+      onUploadProgress?: (progress: { percent: number }) => void;
+    } = {
       cacheControl: '3600',
       upsert: false
-    } as const;
+    };
     
     // Add onUploadProgress handler if provided
     if (onProgress) {
-      // Cast to any to work around TypeScript limitations
-      (options as any).onUploadProgress = (progress: { percent: number }) => {
-        onProgress(progress.percent);
+      options.onUploadProgress = (progress: { percent: number }) => {
+        const percent = Math.round(progress.percent);
+        console.log(`Upload progress: ${percent}%`);
+        onProgress(percent);
       };
     }
     
     // Upload file
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError, data } = await supabase.storage
       .from(bucketName)
       .upload(filePath, file, options);
 
-    if (uploadError) throw uploadError;
-
+    if (uploadError) {
+      console.error("Upload error:", uploadError);
+      throw uploadError;
+    }
+    
+    if (!data) {
+      throw new Error("No data returned from upload");
+    }
+    
+    console.log("File uploaded successfully, getting public URL");
+    
     // Get public URL
-    const { data } = supabase.storage
+    const { data: publicUrlData } = supabase.storage
       .from(bucketName)
       .getPublicUrl(filePath);
 
-    return data.publicUrl;
+    console.log("Public URL generated:", publicUrlData.publicUrl);
+    return publicUrlData.publicUrl;
   } catch (error: any) {
     console.error("File upload error:", error);
     toast({
@@ -72,11 +89,18 @@ export const deleteFile = async (
       }
     }
     
+    console.log(`Attempting to delete file: ${bucketName}/${path}`);
+    
     const { error } = await supabase.storage
       .from(bucketName)
       .remove([path]);
 
-    if (error) throw error;
+    if (error) {
+      console.error("File deletion error:", error);
+      throw error;
+    }
+    
+    console.log("File deleted successfully");
     return true;
   } catch (error: any) {
     console.error("File deletion error:", error);
