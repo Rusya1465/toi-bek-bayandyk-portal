@@ -9,7 +9,168 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      artists: {
+        Row: {
+          contacts: string | null
+          created_at: string
+          description: string | null
+          experience: string | null
+          genre: string | null
+          id: string
+          image_url: string | null
+          name: string
+          owner_id: string
+          price: string | null
+          rating: number | null
+          updated_at: string
+        }
+        Insert: {
+          contacts?: string | null
+          created_at?: string
+          description?: string | null
+          experience?: string | null
+          genre?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          owner_id: string
+          price?: string | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Update: {
+          contacts?: string | null
+          created_at?: string
+          description?: string | null
+          experience?: string | null
+          genre?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          owner_id?: string
+          price?: string | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      places: {
+        Row: {
+          address: string | null
+          capacity: string | null
+          contacts: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          owner_id: string
+          price: string | null
+          rating: number | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          capacity?: string | null
+          contacts?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          owner_id: string
+          price?: string | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          capacity?: string | null
+          contacts?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          owner_id?: string
+          price?: string | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rentals: {
+        Row: {
+          contacts: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          owner_id: string
+          price: string | null
+          rating: number | null
+          specs: string | null
+          updated_at: string
+        }
+        Insert: {
+          contacts?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          owner_id: string
+          price?: string | null
+          rating?: number | null
+          specs?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contacts?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          owner_id?: string
+          price?: string | null
+          rating?: number | null
+          specs?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
