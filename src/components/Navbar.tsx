@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, User, LogOut, Plus, Edit } from "lucide-react";
+import { Menu, User, LogOut, Plus, Edit, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -34,6 +34,9 @@ const Navbar = () => {
       });
     }
   };
+
+  const isAdmin = profile?.role === "admin";
+  const isPartner = profile?.role === "partner" || isAdmin;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -59,6 +62,14 @@ const Navbar = () => {
             >
               Каталог
             </Link>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                Админ панели
+              </Link>
+            )}
           </div>
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
@@ -83,19 +94,33 @@ const Navbar = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuItem asChild>
-                  <Link to="/create-event" className="flex items-center">
-                    <Plus className="mr-2 h-4 w-4" />
-                    <span>Майрамды чогултуу</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/apply-event" className="flex items-center">
-                    <Edit className="mr-2 h-4 w-4" />
-                    <span>Майрамга арыз берүү</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                {isPartner && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to="/create-event" className="flex items-center">
+                        <Plus className="mr-2 h-4 w-4" />
+                        <span>Майрамды чогултуу</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/apply-event" className="flex items-center">
+                        <Edit className="mr-2 h-4 w-4" />
+                        <span>Майрамга арыз берүү</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin" className="flex items-center">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Админ панели</span>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+
                 <DropdownMenuItem onClick={handleSignOut} className="flex items-center">
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Чыгуу</span>
@@ -135,6 +160,15 @@ const Navbar = () => {
             >
               Каталог
             </Link>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Админ панели
+              </Link>
+            )}
           </div>
         </div>
       )}
