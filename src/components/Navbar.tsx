@@ -21,6 +21,11 @@ const Navbar = () => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
+  // Close menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -41,6 +46,11 @@ const Navbar = () => {
 
   const isActive = (path: string) => {
     return location.pathname === path;
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(prev => !prev);
+    console.log("Menu toggled, new state:", !isMenuOpen);
   };
 
   return (
@@ -89,7 +99,7 @@ const Navbar = () => {
             variant="ghost"
             size="icon"
             className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={toggleMenu}
             aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
           >
             {isMenuOpen ? (

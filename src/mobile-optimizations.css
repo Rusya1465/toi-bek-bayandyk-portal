@@ -32,6 +32,22 @@ body {
   overscroll-behavior-y: contain;
 }
 
+/* Mobile menu transition animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
 /* Make inputs work better on mobile */
 input, 
 textarea, 
@@ -42,20 +58,6 @@ select {
 /* Bottom safe area padding utility */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* Animation for mobile menu */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
 }
 
 /* Fix for sticky position elements on iOS */
@@ -79,12 +81,22 @@ select {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
   }
+  
+  /* Improve mobile menu performance */
+  .mobile-menu-open {
+    overflow: hidden !important;
+  }
 }
 
 /* Fix modal scroll issues */
 .modal-open {
-  overflow: hidden;
+  overflow: hidden !important;
   position: fixed;
   width: 100%;
   height: 100%;
+}
+
+/* Burger menu adjustments */
+.menu-open-transition {
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
