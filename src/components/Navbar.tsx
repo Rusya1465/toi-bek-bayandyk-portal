@@ -1,8 +1,8 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, User, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
@@ -23,8 +23,27 @@ const Navbar = () => {
 
   // Close menu when route changes
   useEffect(() => {
-    setIsMenuOpen(false);
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
+      console.log("Route changed, menu closed");
+    }
   }, [location.pathname]);
+
+  // Handle body scroll locking
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.classList.add('mobile-menu-open');
+      console.log("Menu opened, body scroll locked");
+    } else {
+      document.body.classList.remove('mobile-menu-open');
+      console.log("Menu closed, body scroll unlocked");
+    }
+    
+    return () => {
+      document.body.classList.remove('mobile-menu-open');
+      console.log("Cleanup: body scroll restored");
+    };
+  }, [isMenuOpen]);
 
   const handleSignOut = async () => {
     try {
@@ -48,10 +67,19 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  const toggleMenu = () => {
-    setIsMenuOpen(prev => !prev);
-    console.log("Menu toggled, new state:", !isMenuOpen);
-  };
+  const toggleMenu = useCallback((e?: React.MouseEvent) => {
+    // Prevent default and stop propagation to ensure the event doesn't bubble
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    setIsMenuOpen(prevState => {
+      const newState = !prevState;
+      console.log("Menu toggled, new state:", newState);
+      return newState;
+    });
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -100,7 +128,8 @@ const Navbar = () => {
             size="icon"
             className="md:hidden"
             onClick={toggleMenu}
-            aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
+            aria-label={isMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
+            aria-expanded={isMenuOpen}
           >
             {isMenuOpen ? (
               <X className="h-5 w-5" />
@@ -111,7 +140,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Мобильное меню */}
+      {/* Мобильное меню - always rendered but conditionally shown */}
       <NavbarMenu 
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
@@ -120,6 +149,15 @@ const Navbar = () => {
         handleSignOut={handleSignOut}
         user={user}
       />
+      
+      {/* Backdrop for closing the menu when clicking outside */}
+      {isMenuOpen && (
+        <div 
+          className="mobile-menu-backdrop md:hidden" 
+          onClick={toggleMenu}
+          aria-hidden="true"
+        />
+      )}
     </header>
   );
 };

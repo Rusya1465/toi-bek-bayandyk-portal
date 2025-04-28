@@ -4,18 +4,27 @@ import * as React from "react"
 const MOBILE_BREAKPOINT = 768
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean>(window.innerWidth < MOBILE_BREAKPOINT)
+  // Initialize with null to avoid hydration mismatch
+  const [isMobile, setIsMobile] = React.useState<boolean | null>(null)
 
   React.useEffect(() => {
+    // Define the check function
     const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+      const mobile = window.innerWidth < MOBILE_BREAKPOINT
+      console.log(`[Mobile Detection] Screen width: ${window.innerWidth}, isMobile: ${mobile}`)
+      setIsMobile(mobile)
     }
     
+    // Add event listener
     window.addEventListener('resize', checkIfMobile)
-    checkIfMobile() // Check on mount
     
+    // Initial check on mount
+    checkIfMobile()
+    
+    // Cleanup
     return () => window.removeEventListener('resize', checkIfMobile)
   }, [])
 
-  return isMobile
+  // Return false as default during SSR or until detection is complete
+  return isMobile !== null ? isMobile : false
 }

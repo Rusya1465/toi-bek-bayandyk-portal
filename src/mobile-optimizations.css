@@ -14,6 +14,8 @@ button,
 a,
 [role="button"] {
   touch-action: manipulation;
+  min-height: 44px; /* Recommended minimum touch target size */
+  min-width: 44px;
 }
 
 /* Prevent text zoom on orientation change */
@@ -44,8 +46,23 @@ body {
   }
 }
 
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
 .animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-fade-out {
+  animation: fadeOut 0.3s ease-out forwards;
 }
 
 /* Make inputs work better on mobile */
@@ -86,6 +103,30 @@ select {
   .mobile-menu-open {
     overflow: hidden !important;
   }
+  
+  /* Enhanced Mobile Menu */
+  .mobile-menu {
+    position: fixed;
+    top: 64px; /* Match the header height (16px * 4) */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    background-color: var(--bg-color, white);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  .mobile-menu-hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+  }
+  
+  .mobile-menu-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
 }
 
 /* Fix modal scroll issues */
@@ -99,4 +140,20 @@ select {
 /* Burger menu adjustments */
 .menu-open-transition {
   transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Active mobile menu styles */
+.menu-active {
+  display: block !important;
+}
+
+/* Mobile menu backdrop */
+.mobile-menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 39;
 }

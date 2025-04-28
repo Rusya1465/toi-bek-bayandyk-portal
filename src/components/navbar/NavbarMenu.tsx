@@ -1,16 +1,14 @@
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   User, 
   LogOut, 
   Plus, 
-  Edit, 
   Settings, 
   Heart,
   History,
   ShoppingBag,
-  UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
@@ -34,43 +32,49 @@ const NavbarMenu = ({
 }: NavbarMenuProps) => {
   const location = useLocation();
   const { t } = useTranslation();
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close menu on route change
+  // Handle touch events and close menu when clicking outside
   useEffect(() => {
-    setIsMenuOpen(false);
-  }, [location.pathname, setIsMenuOpen]);
-  
-  // Block scrolling when mobile menu is open
-  useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-      console.log("Menu opened, body scroll locked");
-    } else {
-      document.body.style.overflow = '';
-      console.log("Menu closed, body scroll unlocked");
-    }
-    
-    return () => {
-      document.body.style.overflow = '';
-      console.log("Clean up: body scroll restored");
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
     };
-  }, [isMenuOpen]);
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('touchstart', handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+    };
+  }, [isMenuOpen, setIsMenuOpen]);
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
-  // If menu is not open, don't render anything
-  if (!isMenuOpen) return null;
-
+  // We always render the menu but control visibility with CSS
   return (
-    <div className="fixed inset-0 top-16 z-40 bg-background animate-fade-in border-t overflow-y-auto pb-safe md:hidden">
+    <div 
+      ref={menuRef}
+      className={cn(
+        "fixed inset-0 top-16 z-40 bg-background border-t overflow-y-auto pb-safe md:hidden",
+        isMenuOpen ? "block animate-fade-in" : "hidden"
+      )}
+      aria-hidden={!isMenuOpen}
+      role="dialog"
+      aria-modal="true"
+    >
       <div className="container py-6 space-y-6">
         <nav className="space-y-4">
           <Link
             to="/"
             className={cn(
-              "flex items-center py-2 px-1 text-lg font-medium rounded-md transition-colors", 
+              "flex items-center py-3 px-2 text-lg font-medium rounded-md transition-colors", 
               isActive("/") ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted/50"
             )}
             onClick={() => setIsMenuOpen(false)}
@@ -80,7 +84,7 @@ const NavbarMenu = ({
           <Link
             to="/catalog"
             className={cn(
-              "flex items-center py-2 px-1 text-lg font-medium rounded-md transition-colors", 
+              "flex items-center py-3 px-2 text-lg font-medium rounded-md transition-colors", 
               isActive("/catalog") ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted/50"
             )}
             onClick={() => setIsMenuOpen(false)}
@@ -98,7 +102,7 @@ const NavbarMenu = ({
               <Link
                 to="/profile"
                 className={cn(
-                  "flex items-center py-2 px-1 text-base font-medium rounded-md transition-colors", 
+                  "flex items-center py-3 px-2 text-base font-medium rounded-md transition-colors", 
                   isActive("/profile") ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted/50"
                 )}
                 onClick={() => setIsMenuOpen(false)}
@@ -109,7 +113,7 @@ const NavbarMenu = ({
               <Link
                 to="/profile/favorites"
                 className={cn(
-                  "flex items-center py-2 px-1 text-base font-medium rounded-md transition-colors", 
+                  "flex items-center py-3 px-2 text-base font-medium rounded-md transition-colors", 
                   isActive("/profile/favorites") ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted/50"
                 )}
                 onClick={() => setIsMenuOpen(false)}
@@ -120,7 +124,7 @@ const NavbarMenu = ({
               <Link
                 to="/profile/history"
                 className={cn(
-                  "flex items-center py-2 px-1 text-base font-medium rounded-md transition-colors", 
+                  "flex items-center py-3 px-2 text-base font-medium rounded-md transition-colors", 
                   isActive("/profile/history") ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted/50"
                 )}
                 onClick={() => setIsMenuOpen(false)}
@@ -141,7 +145,7 @@ const NavbarMenu = ({
               <Link
                 to="/create-event"
                 className={cn(
-                  "flex items-center py-2 px-1 text-base font-medium rounded-md transition-colors", 
+                  "flex items-center py-3 px-2 text-base font-medium rounded-md transition-colors", 
                   isActive("/create-event") ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted/50"
                 )}
                 onClick={() => setIsMenuOpen(false)}
@@ -152,7 +156,7 @@ const NavbarMenu = ({
               <Link
                 to="/profile/services"
                 className={cn(
-                  "flex items-center py-2 px-1 text-base font-medium rounded-md transition-colors", 
+                  "flex items-center py-3 px-2 text-base font-medium rounded-md transition-colors", 
                   isActive("/profile/services") ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted/50"
                 )}
                 onClick={() => setIsMenuOpen(false)}
@@ -169,7 +173,7 @@ const NavbarMenu = ({
               <Link
                 to="/admin"
                 className={cn(
-                  "flex items-center py-2 px-1 text-base font-medium rounded-md transition-colors", 
+                  "flex items-center py-3 px-2 text-base font-medium rounded-md transition-colors", 
                   isActive("/admin") ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted/50"
                 )}
                 onClick={() => setIsMenuOpen(false)}
@@ -189,7 +193,7 @@ const NavbarMenu = ({
               handleSignOut();
               setIsMenuOpen(false);
             }}
-            className="w-full flex items-center justify-center h-10 px-4 py-2 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+            className="w-full flex items-center justify-center h-12 px-4 py-2 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
           >
             <LogOut className="mr-2 h-4 w-4" />
             {t("nav.logout")}
@@ -198,7 +202,7 @@ const NavbarMenu = ({
           <Link
             to="/auth"
             onClick={() => setIsMenuOpen(false)}
-            className="w-full flex items-center justify-center h-10 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+            className="w-full flex items-center justify-center h-12 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <User className="mr-2 h-4 w-4" />
             {t("nav.login")}
