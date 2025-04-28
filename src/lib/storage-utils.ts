@@ -5,28 +5,6 @@ import { toast } from "@/components/ui/use-toast";
 
 export type UploadProgressHandler = (progress: number) => void;
 
-// Function to ensure the bucket exists
-export const ensureBucketExists = async (bucketName: string) => {
-  // Check if bucket exists
-  const { data: buckets } = await supabase.storage.listBuckets();
-  const bucketExists = buckets?.some(bucket => bucket.name === bucketName);
-  
-  if (!bucketExists) {
-    // Create bucket if it doesn't exist
-    const { error } = await supabase.storage.createBucket(bucketName, {
-      public: true,
-      fileSizeLimit: 5 * 1024 * 1024 // 5MB
-    });
-    
-    if (error) {
-      console.error("Error creating bucket:", error);
-      return false;
-    }
-  }
-  
-  return true;
-}
-
 // Function to upload file with progress tracking
 export const uploadFileWithProgress = async (
   file: File,
@@ -35,12 +13,6 @@ export const uploadFileWithProgress = async (
   onProgress?: UploadProgressHandler
 ): Promise<string | null> => {
   try {
-    // Check if bucket exists or create it
-    const bucketOk = await ensureBucketExists(bucketName);
-    if (!bucketOk) {
-      throw new Error("Failed to create or access storage bucket");
-    }
-    
     // Generate unique file path
     const fileExt = file.name.split(".").pop();
     const fileName = `${uuidv4()}.${fileExt}`;

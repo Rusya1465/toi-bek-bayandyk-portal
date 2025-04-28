@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -92,7 +91,7 @@ export const PlaceStepForm = ({ initialData, isEditing = false }: PlaceFormProps
     uploadImage, 
     initializeImage,
     setImageUrl
-  } = useImageUpload();
+  } = useImageUpload("places"); // Specify "places" bucket explicitly
 
   const { saveDraft, loadDraft, clearDraft } = useFormDraft(
     DRAFT_STORAGE_KEY,
@@ -516,4 +515,3 @@ export const PlaceStepForm = ({ initialData, isEditing = false }: PlaceFormProps
     </Form>
   );
 };
-

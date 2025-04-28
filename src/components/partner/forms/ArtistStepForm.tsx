@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,30 +9,31 @@ import { z } from "zod";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { Form } from "@/components/ui/form";
 import { StepForm } from "@/components/StepForm";
-import { BasicInfoStep } from "../step-forms/BasicInfoStep";
 import { ImageStep } from "../step-forms/ImageStep";
-import { DescriptionStep } from "../step-forms/DescriptionStep";
-import { ContactsStep } from "../step-forms/ContactsStep";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { useFormDraft } from "@/hooks/useFormDraft";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
+import { LanguageFormTabs } from "@/components/LanguageFormTabs";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
-// Define schema
+// Define schema with both languages
 const artistSchema = z.object({
-  name: z.string().min(2, "Аты эң аз дегенде 2 белги болушу керек"),
-  genre: z.string().optional(),
-  experience: z.string().optional(),
+  name: z.string().min(2, "Название должно содержать минимум 2 символа"),
+  name_ru: z.string().optional(),
+  name_kg: z.string().optional(),
   description: z.string().optional(),
+  description_ru: z.string().optional(),
+  description_kg: z.string().optional(),
   price: z.string().optional(),
+  price_ru: z.string().optional(),
+  price_kg: z.string().optional(),
   contacts: z.string().optional(),
+  contacts_ru: z.string().optional(),
+  contacts_kg: z.string().optional(),
+  category: z.string().optional(),
+  category_ru: z.string().optional(),
+  category_kg: z.string().optional(),
 });
 
 export type ArtistFormData = z.infer<typeof artistSchema>;
@@ -46,34 +46,32 @@ interface ArtistFormProps {
 // Define the storage key for drafts
 const DRAFT_STORAGE_KEY = "artist-form-draft";
 
-// Genre options
-const genreOptions = [
-  "Ырчы",
-  "Тамада",
-  "Бийчи",
-  "Музыкант",
-  "DJ",
-  "Ансамбль",
-  "Башка",
-];
-
 export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   // Initialize form
   const form = useForm<ArtistFormData>({
     resolver: zodResolver(artistSchema),
     defaultValues: {
       name: initialData?.name || "",
-      genre: initialData?.genre || "",
-      experience: initialData?.experience || "",
+      name_ru: initialData?.name_ru || "",
+      name_kg: initialData?.name_kg || "",
       description: initialData?.description || "",
+      description_ru: initialData?.description_ru || "",
+      description_kg: initialData?.description_kg || "",
       price: initialData?.price || "",
+      price_ru: initialData?.price_ru || "",
+      price_kg: initialData?.price_kg || "",
       contacts: initialData?.contacts || "",
+      contacts_ru: initialData?.contacts_ru || "",
+      contacts_kg: initialData?.contacts_kg || "",
+      category: initialData?.category || "",
+      category_ru: initialData?.category_ru || "",
+      category_kg: initialData?.category_kg || "",
     },
   });
 
@@ -87,7 +85,7 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
     uploadImage, 
     initializeImage,
     setImageUrl
-  } = useImageUpload();
+  } = useImageUpload("artists");
 
   const { saveDraft, loadDraft, clearDraft } = useFormDraft(
     DRAFT_STORAGE_KEY,
@@ -99,11 +97,15 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
   // Watch fields for validation
   const watchName = form.watch("name");
 
-  // Initialize imageUrl with initial data
+  // Initialize imageUrl with initial data - FIX: Make sure this useEffect returns either nothing or a proper cleanup function
   useEffect(() => {
     if (initialData?.image_url) {
       initializeImage(initialData.image_url);
     }
+    // Return nothing or a proper cleanup function
+    return () => {
+      // Empty cleanup function
+    };
   }, [initialData]);
 
   const handleFormSaveDraft = () => {
@@ -180,52 +182,232 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
     }
   };
 
-  // Genre select component
-  const GenreSelect = () => (
-    <div className="grid grid-cols-1 gap-4">
-      <FormField
-        control={form.control}
-        name="genre"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t("services.fields.genre")}</FormLabel>
-            <Select
-              onValueChange={field.onChange}
-              defaultValue={field.value}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder={t("services.fields.selectCategory")} />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {genreOptions.map((genre) => (
-                  <SelectItem key={genre} value={genre}>
-                    {genre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
+  // Determine which language is alternate based on current language
+  const alternateLanguage = language === "ky" ? "ru" : "ky";
+
+  // Define custom components for language tabs
+  const NameInput = () => {
+    const altLang = alternateLanguage;
+    const altLangField = `name_${altLang}` as "name_ru" | "name_kg";
+    
+    return (
+      <LanguageFormTabs
+        mainContent={
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.nameArtist")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.namePlaceholder")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateContent={
+          <FormField
+            control={form.control}
+            name={altLangField}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.nameArtist")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.namePlaceholder")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateLanguage={altLang}
+        description={t("services.language.form.description")}
       />
-      
-      <FormField
-        control={form.control}
-        name="experience"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t("services.fields.experience")}</FormLabel>
-            <FormControl>
-              <Input placeholder={t("services.fields.experienceArtistPlaceholder")} {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
+    );
+  };
+
+  const CategoryInput = () => {
+    const altLang = alternateLanguage;
+    const altLangField = `category_${altLang}` as "category_ru" | "category_kg";
+    
+    return (
+      <LanguageFormTabs
+        mainContent={
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.category")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.categoryArtist")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateContent={
+          <FormField
+            control={form.control}
+            name={altLangField}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.category")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.categoryArtist")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateLanguage={altLang}
       />
-    </div>
-  );
+    );
+  };
+
+  const DescriptionInputTab = () => {
+    const altLang = alternateLanguage;
+    const altLangField = `description_${altLang}` as "description_ru" | "description_kg";
+    
+    return (
+      <LanguageFormTabs
+        mainContent={
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.description")}</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder={t("services.fields.descriptionArtist")}
+                    className="min-h-[150px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateContent={
+          <FormField
+            control={form.control}
+            name={altLangField}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.description")}</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder={t("services.fields.descriptionArtist")}
+                    className="min-h-[150px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateLanguage={altLang}
+        description={t("services.language.form.description")}
+      />
+    );
+  };
+  
+  const PriceInput = () => {
+    const altLang = alternateLanguage;
+    const altLangField = `price_${altLang}` as "price_ru" | "price_kg";
+    
+    return (
+      <LanguageFormTabs
+        mainContent={
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.price")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.priceArtistExample")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateContent={
+          <FormField
+            control={form.control}
+            name={altLangField}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.price")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("services.fields.priceArtistExample")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateLanguage={altLang}
+      />
+    );
+  };
+
+  const ContactsInput = () => {
+    const altLang = alternateLanguage;
+    const altLangField = `contacts_${altLang}` as "contacts_ru" | "contacts_kg";
+    
+    return (
+      <LanguageFormTabs
+        mainContent={
+          <FormField
+            control={form.control}
+            name="contacts"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.contacts")}</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder={t("services.fields.contactsPlaceholder")}
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateContent={
+          <FormField
+            control={form.control}
+            name={altLangField}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("services.fields.contacts")}</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder={t("services.fields.contactsPlaceholder")}
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        }
+        alternateLanguage={altLang}
+      />
+    );
+  };
 
   // Define steps
   const steps = [
@@ -234,20 +416,15 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
       title: t("services.steps.basicInfo"),
       isValid: !!watchName,
       component: (
-        <BasicInfoStep 
-          form={form}
-          nameLabel={t("services.fields.nameArtist")}
-          namePlaceholder={t("services.fields.nameArtistPlaceholder")}
-          genreLabel={t("services.fields.genre")}
-          experienceOptions={<GenreSelect />}
-          addressLabel=""
-          addressPlaceholder=""
-        />
+        <div className="space-y-4">
+          <NameInput />
+          <CategoryInput />
+        </div>
       )
     },
     {
       id: "image",
-      title: "Сүрөт",
+      title: t("services.steps.images"),
       isValid: true, // Image is optional
       component: (
         <ImageStep
@@ -262,26 +439,17 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
       id: "description",
       title: t("services.steps.description"),
       isValid: true, // Description is optional
-      component: (
-        <DescriptionStep 
-          form={form}
-          descriptionLabel={t("services.fields.description")}
-          descriptionPlaceholder={t("services.fields.descriptionArtist")}
-        />
-      )
+      component: <DescriptionInputTab />
     },
     {
       id: "contacts",
       title: t("services.steps.contacts"),
       isValid: true, // Contacts are optional
       component: (
-        <ContactsStep 
-          form={form}
-          priceLabel={t("services.fields.price")}
-          pricePlaceholder={t("services.fields.priceArtistExample")}
-          contactsLabel={t("services.fields.contacts")}
-          contactsPlaceholder={t("services.fields.contactsPlaceholder")}
-        />
+        <div className="space-y-4">
+          <PriceInput />
+          <ContactsInput />
+        </div>
       )
     }
   ];

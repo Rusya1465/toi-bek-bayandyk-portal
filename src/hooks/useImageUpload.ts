@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { uploadFileWithProgress } from "@/lib/storage-utils";
 
-export const useImageUpload = (bucketName: string = "service-images") => {
+export const useImageUpload = (bucketName: string = "places") => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
