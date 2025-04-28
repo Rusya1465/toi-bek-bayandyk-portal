@@ -117,8 +117,8 @@ export const UsersTab = () => {
   // Update user role mutation
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      // Fixed: Properly specify both type parameters for the RPC function
-      const { data, error } = await supabase.rpc<ChangeUserRoleParams, unknown>('change_user_role', {
+      // Fixed: Type parameters - removing explicit typing for rpc
+      const { data, error } = await supabase.rpc('change_user_role', {
         user_id: userId,
         new_role: role
       });
