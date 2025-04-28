@@ -34,23 +34,33 @@ export const useImageUpload = (bucketName: string = "service-images") => {
     if (!user || !imageFile) return imageUrl;
     
     setUploading(true);
-    const finalImageUrl = await uploadFileWithProgress(
-      imageFile,
-      bucketName,
-      user.id,
-      (progress) => setUploadProgress(progress)
-    );
-    setUploading(false);
-    
-    if (!finalImageUrl) {
+    try {
+      const finalImageUrl = await uploadFileWithProgress(
+        imageFile,
+        bucketName,
+        user.id,
+        (progress) => setUploadProgress(progress)
+      );
+      
+      if (!finalImageUrl) {
+        toast({
+          variant: "destructive",
+          description: "Error uploading image",
+        });
+        return null;
+      }
+      
+      return finalImageUrl;
+    } catch (error) {
+      console.error("Upload error:", error);
       toast({
         variant: "destructive",
         description: "Error uploading image",
       });
       return null;
+    } finally {
+      setUploading(false);
     }
-
-    return finalImageUrl;
   };
 
   const initializeImage = (initialImageUrl: string | null) => {

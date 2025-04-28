@@ -37,7 +37,7 @@ export const StepForm: React.FC<StepFormProps> = ({
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
 
   const nextStep = useCallback(() => {
-    if (!currentStep.isValid) {
+    if (!currentStep?.isValid) {
       toast({
         variant: "destructive",
         description: t("forms.required"),
@@ -50,12 +50,9 @@ export const StepForm: React.FC<StepFormProps> = ({
       
       if (saveDraft) {
         saveDraft();
-        toast({
-          description: t("services.messages.draftSaved"),
-        });
       }
     }
-  }, [currentStepIndex, steps.length, currentStep.isValid, saveDraft, toast, t]);
+  }, [currentStepIndex, steps.length, currentStep?.isValid, saveDraft, toast, t]);
 
   const prevStep = useCallback(() => {
     if (currentStepIndex > 0) {
@@ -77,7 +74,7 @@ export const StepForm: React.FC<StepFormProps> = ({
     onSubmit();
   };
 
-  // Keyboard navigation between steps
+  // Keyboard navigation between steps - FIX: Ensure proper cleanup
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" && e.ctrlKey) {
@@ -86,6 +83,8 @@ export const StepForm: React.FC<StepFormProps> = ({
     };
 
     document.addEventListener("keydown", handleKeyDown);
+    
+    // Proper cleanup function
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
@@ -122,7 +121,7 @@ export const StepForm: React.FC<StepFormProps> = ({
 
       {/* Step content */}
       <form id={formId} onSubmit={handleSubmitForm}>
-        {currentStep.component}
+        {currentStep && currentStep.component}
 
         {/* Navigation buttons */}
         <div className="flex justify-between mt-8">
@@ -168,14 +167,14 @@ export const StepForm: React.FC<StepFormProps> = ({
               <Button 
                 type="button" 
                 onClick={nextStep}
-                disabled={loading || !currentStep.isValid}
+                disabled={loading || !currentStep?.isValid}
               >
                 {t("common.next")}
               </Button>
             ) : (
               <Button 
                 type="submit"
-                disabled={loading || !currentStep.isValid}
+                disabled={loading || !currentStep?.isValid}
               >
                 {t("common.submit")}
               </Button>

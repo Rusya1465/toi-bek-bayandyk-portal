@@ -10,10 +10,7 @@ import { z } from "zod";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { Form } from "@/components/ui/form";
 import { StepForm } from "@/components/StepForm";
-import { BasicInfoStep } from "../step-forms/BasicInfoStep";
 import { ImageStep } from "../step-forms/ImageStep";
-import { DescriptionStep } from "../step-forms/DescriptionStep";
-import { ContactsStep } from "../step-forms/ContactsStep";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import { LanguageFormTabs } from "@/components/LanguageFormTabs";
@@ -107,11 +104,15 @@ export const PlaceStepForm = ({ initialData, isEditing = false }: PlaceFormProps
   // Watch fields for validation
   const watchName = form.watch("name");
 
-  // Initialize imageUrl with initial data
+  // Initialize imageUrl with initial data - FIX: Make sure this useEffect returns either nothing or a proper cleanup function
   useEffect(() => {
     if (initialData?.image_url) {
       initializeImage(initialData.image_url);
     }
+    // Return nothing or a proper cleanup function
+    return () => {
+      // Empty cleanup function
+    };
   }, [initialData]);
 
   const handleFormSaveDraft = () => {
@@ -515,3 +516,4 @@ export const PlaceStepForm = ({ initialData, isEditing = false }: PlaceFormProps
     </Form>
   );
 };
+

@@ -20,7 +20,7 @@ export const LanguageSwitch = () => {
       onClick={toggleLanguage}
     >
       <Globe className={`h-4 w-4 ${isMobile ? '' : 'mr-1'}`} />
-      {isMobile ? null : (
+      {!isMobile ? (
         language === "ky" ? (
           <>
             <span className="mr-1">🇰🇬</span> КЫР
@@ -30,8 +30,7 @@ export const LanguageSwitch = () => {
             <span className="mr-1">🇷🇺</span> РУС
           </>
         )
-      )}
-      {isMobile && (
+      ) : (
         language === "ky" ? (
           <span className="ml-1">🇰🇬</span>
         ) : (
