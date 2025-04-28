@@ -147,7 +147,7 @@ export const ArtistForm = ({ initialData, isEditing = false }: ArtistFormProps) 
         // Create new artist
         const { error } = await supabase
           .from("artists")
-          .insert([artistData]);
+          .insert(artistData);  // Fix: removed the array brackets
 
         if (error) throw error;
 

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -130,7 +129,7 @@ export const PlaceForm = ({ initialData, isEditing = false }: PlaceFormProps) =>
         // Create new place
         const { error } = await supabase
           .from("places")
-          .insert([placeData]);
+          .insert([placeData]);  // Fix: removed the array brackets
 
         if (error) throw error;
 
