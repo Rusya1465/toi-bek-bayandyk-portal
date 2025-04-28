@@ -12,7 +12,11 @@
     "back": "Назад",
     "submit": "Отправить",
     "error": "Ошибка",
-    "success": "Успешно"
+    "success": "Успешно",
+    "switchToRu": "Переключить на русский",
+    "switchToKg": "Кыргызча которуу",
+    "mainLanguage": "Основной язык",
+    "alternateLanguage": "Альтернативный язык"
   },
   "nav": {
     "home": "Главная",
@@ -58,7 +62,19 @@
       "filter": "Фильтр",
       "search": "Поиск",
       "sortByPrice": "Сортировка по цене"
-    }
+    },
+    "price": "Цена",
+    "capacity": "Вместимость",
+    "address": "Адрес",
+    "genre": "Жанр",
+    "specs": "Тех. характеристики",
+    "experience": "Опыт",
+    "contacts": "Контакты",
+    "newItem": "Новый",
+    "noDescription": "Нет описания",
+    "priceOnRequest": "По договоренности",
+    "notSpecified": "Не указано",
+    "moreDetails": "Подробнее"
   },
   "services": {
     "createTitle": {
@@ -124,6 +140,9 @@
       "deleteError": "Ошибка при удалении услуги",
       "draftSaved": "Черновик сохранен",
       "draftLoaded": "Черновик загружен"
+    },
+    "language": {
+      "instructions": "Заполните информацию на двух языках"
     }
   }
 }

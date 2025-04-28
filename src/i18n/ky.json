@@ -12,7 +12,11 @@
     "back": "Артка",
     "submit": "Тапшыруу",
     "error": "Ката",
-    "success": "Ийгиликтүү"
+    "success": "Ийгиликтүү",
+    "switchToRu": "Переключить на русский",
+    "switchToKg": "Кыргызча которуу",
+    "mainLanguage": "Негизги тил",
+    "alternateLanguage": "Альтернативдүү тил"
   },
   "nav": {
     "home": "Башкы бет",
@@ -58,7 +62,19 @@
       "filter": "Фильтр",
       "search": "Издөө",
       "sortByPrice": "Баасы боюнча сорттоо"
-    }
+    },
+    "price": "Баасы",
+    "capacity": "Сыйымдуулугу",
+    "address": "Дареги",
+    "genre": "Жанр",
+    "specs": "Техникалык мүнөздөмө",
+    "experience": "Тажрыйба",
+    "contacts": "Байланыштар",
+    "newItem": "Жаңы",
+    "noDescription": "Сүрөттөмө жок",
+    "priceOnRequest": "Келишим боюнча",
+    "notSpecified": "Көрсөтүлгөн эмес",
+    "moreDetails": "Көбүрөөк маалымат"
   },
   "services": {
     "createTitle": {
@@ -124,6 +140,9 @@
       "deleteError": "Кызматты өчүрүүдө ката кетти",
       "draftSaved": "Черновик сакталды",
       "draftLoaded": "Черновик жүктөлдү"
+    },
+    "language": {
+      "instructions": "Эки тилде маалыматты толтуруңуз"
     }
   }
 }

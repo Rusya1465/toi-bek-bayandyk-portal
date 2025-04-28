@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 interface PlaceCardProps {
   place: {
@@ -13,43 +14,61 @@ interface PlaceCardProps {
     address?: string;
     image_url?: string;
     rating?: number;
+    name_ru?: string;
+    name_kg?: string;
+    description_ru?: string;
+    description_kg?: string;
+    price_ru?: string;
+    price_kg?: string;
+    capacity_ru?: string;
+    capacity_kg?: string;
+    address_ru?: string;
+    address_kg?: string;
   };
 }
 
 export const PlaceCard = ({ place }: PlaceCardProps) => {
+  const { getLocalizedField, t } = useTranslation();
+
+  const name = getLocalizedField(place, "name");
+  const description = getLocalizedField(place, "description");
+  const price = getLocalizedField(place, "price");
+  const capacity = getLocalizedField(place, "capacity");
+  const address = getLocalizedField(place, "address");
+  
   return (
     <Card className="overflow-hidden">
       <div className="aspect-video overflow-hidden">
         <img 
           src={place.image_url || "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"} 
-          alt={place.name}
+          alt={name}
           className="w-full h-full object-cover transition-transform hover:scale-105"
         />
       </div>
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-2">
-          <CardTitle className="text-lg">{place.name}</CardTitle>
+          <CardTitle className="text-lg">{name}</CardTitle>
           <span className="px-2 py-1 bg-muted text-sm rounded-md">
-            ⭐ {place.rating || "Жаңы"}
+            ⭐ {place.rating || t("catalog.newItem")}
           </span>
         </div>
-        <CardDescription className="mb-4">{place.description || "Сүрөттөмө жок"}</CardDescription>
+        <CardDescription className="mb-4">{description || t("catalog.noDescription")}</CardDescription>
         <div className="flex flex-col space-y-1 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Баасы:</span>
-            <span className="font-medium">{place.price || "Келишим боюнча"}</span>
+            <span className="text-muted-foreground">{t("catalog.price")}:</span>
+            <span className="font-medium">{price || t("catalog.priceOnRequest")}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Сыйымдуулугу:</span>
-            <span className="font-medium">{place.capacity || "Көрсөтүлгөн эмес"}</span>
+            <span className="text-muted-foreground">{t("catalog.capacity")}:</span>
+            <span className="font-medium">{capacity || t("catalog.notSpecified")}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Дареги:</span>
-            <span className="font-medium">{place.address || "Көрсөтүлгөн эмес"}</span>
+            <span className="text-muted-foreground">{t("catalog.address")}:</span>
+            <span className="font-medium">{address || t("catalog.notSpecified")}</span>
           </div>
         </div>
         <Button className="w-full mt-4" asChild>
-          <Link to={`/places/${place.id}`}>Көбүрөөк маалымат</Link>
+          <Link to={`/places/${place.id}`}>{t("catalog.moreDetails")}</Link>
         </Button>
       </CardContent>
     </Card>

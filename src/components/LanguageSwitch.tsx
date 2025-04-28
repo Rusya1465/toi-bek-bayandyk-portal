@@ -11,12 +11,20 @@ export const LanguageSwitch = () => {
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="sm"
-      className="font-medium"
+      className="font-medium flex items-center gap-1"
       onClick={toggleLanguage}
     >
-      {language === "ky" ? "RU" : "KG"}
+      {language === "ky" ? (
+        <>
+          <span className="mr-1">🇰🇬</span> KG
+        </>
+      ) : (
+        <>
+          <span className="mr-1">🇷🇺</span> RU
+        </>
+      )}
     </Button>
   );
 };

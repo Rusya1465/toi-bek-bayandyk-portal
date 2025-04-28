@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import ruTranslations from "../i18n/ru.json";
 import kyTranslations from "../i18n/ky.json";
@@ -7,6 +6,8 @@ type LanguageContextType = {
   language: "ky" | "ru";
   setLanguage: (language: "ky" | "ru") => void;
   t: (key: string) => string;
+  getLocalizedField: <T extends Record<string, any>>(item: T, field: string) => string;
+  formatFieldName: (field: string, lang?: "ky" | "ru") => string;
 };
 
 const translations = {
@@ -45,8 +46,41 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return typeof result === "string" ? result : key;
   };
 
+  // Function to get localized content from database items
+  const getLocalizedField = <T extends Record<string, any>>(item: T, field: string): string => {
+    if (!item) return "";
+    
+    // First try to get the localized field based on current language
+    const localizedFieldName = `${field}_${language}`;
+    
+    // If the localized field exists and has a value, use it
+    if (item[localizedFieldName]) {
+      return item[localizedFieldName];
+    }
+    
+    // Otherwise fallback to the default field
+    if (item[field]) {
+      return item[field];
+    }
+    
+    // If all else fails, return empty string
+    return "";
+  };
+
+  // Function to format field name based on language (for form inputs)
+  const formatFieldName = (field: string, lang?: "ky" | "ru"): string => {
+    const langToUse = lang || language;
+    return langToUse === defaultLanguage ? field : `${field}_${langToUse}`;
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ 
+      language, 
+      setLanguage, 
+      t, 
+      getLocalizedField,
+      formatFieldName 
+    }}>
       {children}
     </LanguageContext.Provider>
   );
