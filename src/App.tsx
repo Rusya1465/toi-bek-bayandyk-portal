@@ -19,6 +19,9 @@ import RentalDetailPage from "./pages/RentalDetailPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ServiceFormPage from "./pages/ServiceFormPage";
 
+// For better mobile touch behavior
+import "./mobile-optimizations.css";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

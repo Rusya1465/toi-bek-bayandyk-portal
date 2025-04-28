@@ -1,5 +1,6 @@
 
 import { ReactNode } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Card,
   CardContent,
@@ -22,6 +23,23 @@ const AuthContainer = ({
   children,
   footer,
 }: AuthContainerProps) => {
+  const isMobile = useIsMobile();
+  
+  if (isMobile) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-65px)] max-w-md mx-auto w-full px-4 pt-4 pb-safe overflow-y-auto">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">{title}</h1>
+          <p className="text-muted-foreground mt-1">{description}</p>
+        </div>
+        <div className="flex-1">
+          {children}
+        </div>
+        {footer && <div className="mt-6 flex justify-center">{footer}</div>}
+      </div>
+    );
+  }
+
   return (
     <div className="container max-w-md py-8">
       <Card>

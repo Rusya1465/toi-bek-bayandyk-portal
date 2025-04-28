@@ -1,9 +1,10 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, X } from "lucide-react";
 import AuthContainer from "@/components/auth/AuthContainer";
 import LoginForm from "@/components/auth/LoginForm";
 import RegisterForm from "@/components/auth/RegisterForm";
@@ -11,6 +12,7 @@ import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
 import type { LoginFormValues } from "@/components/auth/LoginForm";
 import type { RegisterFormValues } from "@/components/auth/RegisterForm";
 import type { ResetFormValues } from "@/components/auth/ResetPasswordForm";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const AuthPage = () => {
   // Form states
@@ -20,6 +22,20 @@ const AuthPage = () => {
   
   const { signIn, signUp, requestPasswordReset } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isMobile = useIsMobile();
+  
+  // Prevent body scrolling on mobile
+  useEffect(() => {
+    if (isMobile) {
+      document.body.classList.add('overflow-hidden');
+      
+      return () => {
+        document.body.classList.remove('overflow-hidden');
+      };
+    }
+  }, [isMobile]);
 
   const getErrorMessage = (error: any): string => {
     const message = error?.message || "Күтүлбөгөн ката кетти";
@@ -95,61 +111,99 @@ const AuthPage = () => {
     }
   };
 
+  const handleBack = () => {
+    // If we came from somewhere else in the app, go back there
+    if (location.key !== "default") {
+      navigate(-1);
+    } else {
+      // Otherwise go to home
+      navigate("/");
+    }
+  };
+
+  // Mobile header with back button
+  const MobileHeader = () => (
+    <div className="flex items-center justify-between pt-4 px-4 md:hidden">
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={handleBack}
+        className="hover:bg-transparent -ml-3"
+      >
+        <ArrowLeft className="h-6 w-6" />
+      </Button>
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={handleBack}
+        className="hover:bg-transparent -mr-3"
+      >
+        <X className="h-6 w-6" />
+      </Button>
+    </div>
+  );
+
   if (isResettingPassword) {
     return (
-      <AuthContainer 
-        title="Сырсөздү калыбына келтирүү"
-        description="Сырсөздү калыбына келтирүү шилтемеси электрондук почтаңызга жөнөтүлөт"
-        footer={
-          <Button 
-            variant="link" 
-            onClick={() => setIsResettingPassword(false)}
-            disabled={loading}
-          >
-            Кирүүгө кайтуу
-          </Button>
-        }
-      >
-        <ResetPasswordForm 
-          onSubmit={handlePasswordReset} 
-          onCancel={() => setIsResettingPassword(false)} 
-          loading={loading} 
-        />
-      </AuthContainer>
+      <>
+        {isMobile && <MobileHeader />}
+        <AuthContainer 
+          title="Сырсөздү калыбына келтирүү"
+          description="Сырсөздү калыбына келтирүү шилтемеси электрондук почтаңызга жөнөтүлөт"
+          footer={
+            <Button 
+              variant="link" 
+              onClick={() => setIsResettingPassword(false)}
+              disabled={loading}
+            >
+              Кирүүгө кайтуу
+            </Button>
+          }
+        >
+          <ResetPasswordForm 
+            onSubmit={handlePasswordReset} 
+            onCancel={() => setIsResettingPassword(false)} 
+            loading={loading} 
+          />
+        </AuthContainer>
+      </>
     );
   }
 
   return (
-    <AuthContainer
-      title={activeTab === "login" ? "Кирүү" : "Катталуу"}
-      description={
-        activeTab === "login"
-          ? "Системага кирүү үчүн маалыматтарыңызды киргизиңиз"
-          : "Жаңы аккаунт түзүү үчүн маалыматтарыңызды киргизиңиз"
-      }
-    >
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")}>
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="login">Кирүү</TabsTrigger>
-          <TabsTrigger value="register">Катталуу</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="login">
-          <LoginForm 
-            onSubmit={handleLoginSubmit} 
-            onForgotPassword={() => setIsResettingPassword(true)} 
-            loading={loading} 
-          />
-        </TabsContent>
-        
-        <TabsContent value="register">
-          <RegisterForm 
-            onSubmit={handleRegisterSubmit} 
-            loading={loading} 
-          />
-        </TabsContent>
-      </Tabs>
-    </AuthContainer>
+    <>
+      {isMobile && <MobileHeader />}
+      <AuthContainer
+        title={activeTab === "login" ? "Кирүү" : "Катталуу"}
+        description={
+          activeTab === "login"
+            ? "Системага кирүү үчүн маалыматтарыңызды киргизиңиз"
+            : "Жаңы аккаунт түзүү үчүн маалыматтарыңызды киргизиңиз"
+        }
+      >
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")}>
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="login">Кирүү</TabsTrigger>
+            <TabsTrigger value="register">Катталуу</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="login">
+            <LoginForm 
+              onSubmit={handleLoginSubmit} 
+              onForgotPassword={() => setIsResettingPassword(true)} 
+              loading={loading} 
+            />
+          </TabsContent>
+          
+          <TabsContent value="register">
+            <RegisterForm 
+              onSubmit={handleRegisterSubmit} 
+              loading={loading} 
+            />
+          </TabsContent>
+        </Tabs>
+      </AuthContainer>
+    </>
   );
 };
 
