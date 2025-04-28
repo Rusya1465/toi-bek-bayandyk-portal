@@ -2,9 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { Globe } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const LanguageSwitch = () => {
   const { language, setLanguage } = useTranslation();
+  const isMobile = useIsMobile();
 
   const toggleLanguage = () => {
     setLanguage(language === "ky" ? "ru" : "ky");
@@ -13,19 +15,28 @@ export const LanguageSwitch = () => {
   return (
     <Button
       variant="outline"
-      size="sm"
-      className="font-medium flex items-center gap-1"
+      size={isMobile ? "sm" : "sm"}
+      className={`font-medium flex items-center ${isMobile ? 'px-2' : 'gap-1'}`}
       onClick={toggleLanguage}
     >
-      <Globe className="h-4 w-4 mr-1" />
-      {language === "ky" ? (
-        <>
-          <span className="mr-1">🇰🇬</span> КЫР
-        </>
-      ) : (
-        <>
-          <span className="mr-1">🇷🇺</span> РУС
-        </>
+      <Globe className={`h-4 w-4 ${isMobile ? '' : 'mr-1'}`} />
+      {isMobile ? null : (
+        language === "ky" ? (
+          <>
+            <span className="mr-1">🇰🇬</span> КЫР
+          </>
+        ) : (
+          <>
+            <span className="mr-1">🇷🇺</span> РУС
+          </>
+        )
+      )}
+      {isMobile && (
+        language === "ky" ? (
+          <span className="ml-1">🇰🇬</span>
+        ) : (
+          <span className="ml-1">🇷🇺</span>
+        )
       )}
     </Button>
   );

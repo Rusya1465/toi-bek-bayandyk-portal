@@ -12,8 +12,8 @@ const CatalogPage = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="container px-4 py-8 animate-fade-in">
-      <h1 className="text-3xl font-bold tracking-tight mb-4">{t("nav.catalog")}</h1>
+    <div className="container px-4 py-6 md:py-8 animate-fade-in">
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4">{t("nav.catalog")}</h1>
       
       <FilterControls 
         searchQuery={searchQuery}
@@ -23,10 +23,16 @@ const CatalogPage = () => {
       />
 
       <Tabs defaultValue="venues">
-        <TabsList className="grid w-full grid-cols-3 mb-8">
-          <TabsTrigger value="venues">{t("catalog.categories.venues")}</TabsTrigger>
-          <TabsTrigger value="artists">{t("catalog.categories.artists")}</TabsTrigger>
-          <TabsTrigger value="equipment">{t("catalog.categories.equipment")}</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 mb-4 sm:mb-8">
+          <TabsTrigger value="venues" className="text-xs sm:text-sm py-1.5 sm:py-2">
+            {t("catalog.categories.venues")}
+          </TabsTrigger>
+          <TabsTrigger value="artists" className="text-xs sm:text-sm py-1.5 sm:py-2">
+            {t("catalog.categories.artists")}
+          </TabsTrigger>
+          <TabsTrigger value="equipment" className="text-xs sm:text-sm py-1.5 sm:py-2">
+            {t("catalog.categories.equipment")}
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="venues">

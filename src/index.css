@@ -36,6 +36,12 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+    
+    /* Добавляем переменные для безопасных отступов на мобильных */
+    --safe-top: env(safe-area-inset-top, 0);
+    --safe-bottom: env(safe-area-inset-bottom, 0);
+    --safe-left: env(safe-area-inset-left, 0);
+    --safe-right: env(safe-area-inset-right, 0);
   }
 }
 
@@ -44,9 +50,27 @@
     @apply border-border;
   }
 
+  html {
+    -webkit-tap-highlight-color: transparent; /* Убираем подсвечивание при клике на мобильных */
+    font-size: 16px; /* Базовый размер шрифта для лучшей читаемости */
+    @apply scroll-smooth;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* Решает проблему с 100vh на мобильных */
+  }
+
+  /* Улучшаем кликабельную зону на мобильных */
+  button, a, [role="button"] {
+    @apply touch-manipulation;
+  }
+
+  input, textarea, select {
+    @apply text-base; /* Увеличиваем размер текста в полях ввода на мобильных */
+    font-size: max(16px, 1rem); /* Предотвращаем зум при фокусе на iOS */
   }
 }
 
@@ -85,5 +109,50 @@
   
   .banner-gradient {
     background: linear-gradient(90deg, rgba(234, 56, 76, 0.1) 0%, rgba(255, 193, 7, 0.1) 100%);
+  }
+
+  /* Новые адаптивные компоненты */
+  .mobile-container {
+    @apply px-4 py-5 md:px-6 md:py-6 lg:px-8;
+  }
+  
+  .mobile-touch-target {
+    @apply min-h-11 min-w-11 flex items-center justify-center;
+  }
+  
+  /* Компоненты для мобильной оптимизации */
+  .card-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6;
+  }
+  
+  /* Оптимизированный контейнер для сайта */
+  .responsive-container {
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+@layer utilities {
+  /* Убираем overscroll на мобильных */
+  .overscroll-none {
+    overscroll-behavior: none;
+  }
+
+  /* Поддержка безопасных зон */
+  .pb-safe {
+    padding-bottom: var(--safe-bottom);
+  }
+  
+  .pt-safe {
+    padding-top: var(--safe-top);
+  }
+
+  /* Исправляем проблему с полосой прокрутки на мобильных */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
