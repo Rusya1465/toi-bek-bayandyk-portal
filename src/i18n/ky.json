@@ -1,0 +1,129 @@
+
+{
+  "common": {
+    "appName": "ToiBek",
+    "loading": "Жүктөлүүдө...",
+    "cancel": "Жокко чыгаруу",
+    "save": "Сактоо",
+    "create": "Түзүү",
+    "update": "Жаңыртуу",
+    "delete": "Өчүрүү",
+    "next": "Кийинки",
+    "back": "Артка",
+    "submit": "Тапшыруу",
+    "error": "Ката",
+    "success": "Ийгиликтүү"
+  },
+  "nav": {
+    "home": "Башкы бет",
+    "catalog": "Каталог",
+    "profile": "Жеке кабинет",
+    "settings": "Профиль жөндөөлөрү",
+    "favorites": "Тандалмалар",
+    "history": "Тарых",
+    "services": "Менин кызматтарым",
+    "admin": "Админ панели",
+    "login": "Кирүү",
+    "logout": "Чыгуу",
+    "createEvent": "Майрамды чогултуу",
+    "applyEvent": "Майрамга арыз берүү"
+  },
+  "forms": {
+    "required": "Милдеттүү талаа",
+    "invalidEmail": "Туура эмес email форматы",
+    "passwordMismatch": "Сырсөздөр дал келбейт",
+    "minLength": "Минималдуу узундук: {{length}} белги",
+    "imageUpload": {
+      "select": "Сүрөт тандаңыз",
+      "drag": "же сүйрөп келиңиз",
+      "uploading": "Жүктөлүүдө...",
+      "success": "Сүрөт жүктөлдү",
+      "error": "Сүрөттү жүктөөдө ката кетти",
+      "remove": "Сүрөттү алып салуу"
+    },
+    "notifications": {
+      "formSaved": "Форма сакталды",
+      "draftSaved": "Черновик сакталды",
+      "loginSuccess": "Ийгиликтүү кирдиңиз",
+      "loginError": "Кирүүдө ката",
+      "registerSuccess": "Каттоо ийгиликтүү аяктады",
+      "registerError": "Каттоодо ката"
+    }
+  },
+  "catalog": {
+    "categories": {
+      "venues": "Жайлар",
+      "artists": "Артисттер",
+      "equipment": "Ижара",
+      "filter": "Фильтр",
+      "search": "Издөө",
+      "sortByPrice": "Баасы боюнча сорттоо"
+    }
+  },
+  "services": {
+    "createTitle": {
+      "places": "Жай түзүү",
+      "artists": "Артист түзүү",
+      "rentals": "Ижара түзүү"
+    },
+    "editTitle": {
+      "places": "Жайды редактирлөө",
+      "artists": "Артистти редактирлөө",
+      "rentals": "Ижараны редактирлөө"
+    },
+    "steps": {
+      "basicInfo": "Негизги маалымат",
+      "images": "Сүрөттөр",
+      "description": "Кеңири сыпаттама",
+      "contacts": "Баалар жана байланыштар"
+    },
+    "fields": {
+      "name": "Аты",
+      "description": "Сыпаттама",
+      "address": "Дареги",
+      "capacity": "Сыйымдуулугу",
+      "price": "Баасы",
+      "contacts": "Байланыш маалыматтары",
+      "genre": "Категория",
+      "experience": "Тажрыйба",
+      "specs": "Техникалык мүнөздөмөлөр",
+      "namePlace": "Жайдын аты",
+      "namePlaceholder": "Ресторан же банкет залынын аты",
+      "descriptionPlace": "Жайдын сыпаттамасы, өзгөчөлүктөрү жана кошумча маалымат",
+      "addressPlace": "Толук дареги",
+      "capacityPlace": "Канча адам батат",
+      "pricePlaceExample": "Мисалы: 50000-100000 сом",
+      "contactsPlaceholder": "Телефон, WhatsApp же башка байланыш",
+      "nameArtist": "Аты",
+      "nameArtistPlaceholder": "Атыңыз же топтун аты",
+      "categoryArtist": "Категория",
+      "selectCategory": "Категорияны тандаңыз",
+      "experienceArtist": "Тажрыйба",
+      "experienceArtistPlaceholder": "Мисалы: 5 жыл",
+      "descriptionArtist": "Өзүңүз, репертуарыңыз же кызматтарыңыз жөнүндө кыскача маалымат",
+      "priceArtistExample": "Мисалы: Саатына 5000 сом",
+      "nameRental": "Ижара аты",
+      "nameRentalPlaceholder": "Ижарага берилүүчү буюмдун аты",
+      "specsRental": "Техникалык мүнөздөмөлөр",
+      "descriptionRental": "Буюм жөнүндө кошумча маалымат",
+      "priceRentalExample": "Мисалы: Күнүнө 3000 сом"
+    },
+    "buttons": {
+      "createService": "Кызмат кошуу",
+      "editService": "Кызматты редактирлөө",
+      "deleteService": "Кызматты өчүрүү",
+      "saveDraft": "Черновикти сактоо",
+      "loadDraft": "Черновикти жүктөө"
+    },
+    "messages": {
+      "createSuccess": "Кызмат ийгиликтүү түзүлдү",
+      "updateSuccess": "Кызмат ийгиликтүү жаңыртылды",
+      "deleteSuccess": "Кызмат ийгиликтүү өчүрүлдү",
+      "createError": "Кызматты түзүүдө ката кетти",
+      "updateError": "Кызматты жаңыртууда ката кетти",
+      "deleteError": "Кызматты өчүрүүдө ката кетти",
+      "draftSaved": "Черновик сакталды",
+      "draftLoaded": "Черновик жүктөлдү"
+    }
+  }
+}

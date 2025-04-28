@@ -5,13 +5,15 @@ import { VenuesTab } from "@/components/catalog/VenuesTab";
 import { ArtistsTab } from "@/components/catalog/ArtistsTab";
 import { RentalsTab } from "@/components/catalog/RentalsTab";
 import { useCatalogFilters } from "@/hooks/useCatalogFilters";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 const CatalogPage = () => {
   const { searchQuery, setSearchQuery, priceSort, setPriceSort, filterItems } = useCatalogFilters();
+  const { t } = useTranslation();
 
   return (
     <div className="container px-4 py-8 animate-fade-in">
-      <h1 className="text-3xl font-bold tracking-tight mb-4">Каталог</h1>
+      <h1 className="text-3xl font-bold tracking-tight mb-4">{t("nav.catalog")}</h1>
       
       <FilterControls 
         searchQuery={searchQuery}
@@ -22,9 +24,9 @@ const CatalogPage = () => {
 
       <Tabs defaultValue="venues">
         <TabsList className="grid w-full grid-cols-3 mb-8">
-          <TabsTrigger value="venues">Жайлар</TabsTrigger>
-          <TabsTrigger value="artists">Артисттер</TabsTrigger>
-          <TabsTrigger value="equipment">Ижара</TabsTrigger>
+          <TabsTrigger value="venues">{t("catalog.categories.venues")}</TabsTrigger>
+          <TabsTrigger value="artists">{t("catalog.categories.artists")}</TabsTrigger>
+          <TabsTrigger value="equipment">{t("catalog.categories.equipment")}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="venues">

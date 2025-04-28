@@ -1,0 +1,129 @@
+
+{
+  "common": {
+    "appName": "ToiBek",
+    "loading": "Загрузка...",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "create": "Создать",
+    "update": "Обновить",
+    "delete": "Удалить",
+    "next": "Далее",
+    "back": "Назад",
+    "submit": "Отправить",
+    "error": "Ошибка",
+    "success": "Успешно"
+  },
+  "nav": {
+    "home": "Главная",
+    "catalog": "Каталог",
+    "profile": "Личный кабинет",
+    "settings": "Настройки профиля",
+    "favorites": "Избранные",
+    "history": "История",
+    "services": "Мои услуги",
+    "admin": "Админ панель",
+    "login": "Войти",
+    "logout": "Выйти",
+    "createEvent": "Создать мероприятие",
+    "applyEvent": "Подать заявку на мероприятие"
+  },
+  "forms": {
+    "required": "Обязательное поле",
+    "invalidEmail": "Неверный формат email",
+    "passwordMismatch": "Пароли не совпадают",
+    "minLength": "Минимальная длина: {{length}} символов",
+    "imageUpload": {
+      "select": "Выберите изображение",
+      "drag": "или перетащите файл сюда",
+      "uploading": "Загрузка...",
+      "success": "Изображение загружено",
+      "error": "Ошибка при загрузке изображения",
+      "remove": "Удалить изображение"
+    },
+    "notifications": {
+      "formSaved": "Форма сохранена",
+      "draftSaved": "Черновик сохранен",
+      "loginSuccess": "Вход выполнен успешно",
+      "loginError": "Ошибка входа",
+      "registerSuccess": "Регистрация выполнена успешно",
+      "registerError": "Ошибка регистрации"
+    }
+  },
+  "catalog": {
+    "categories": {
+      "venues": "Заведения",
+      "artists": "Артисты",
+      "equipment": "Аренда",
+      "filter": "Фильтр",
+      "search": "Поиск",
+      "sortByPrice": "Сортировка по цене"
+    }
+  },
+  "services": {
+    "createTitle": {
+      "places": "Создать заведение",
+      "artists": "Создать артиста",
+      "rentals": "Создать аренду"
+    },
+    "editTitle": {
+      "places": "Редактировать заведение",
+      "artists": "Редактировать артиста",
+      "rentals": "Редактировать аренду"
+    },
+    "steps": {
+      "basicInfo": "Основная информация",
+      "images": "Изображения",
+      "description": "Детальное описание",
+      "contacts": "Цены и контакты"
+    },
+    "fields": {
+      "name": "Название",
+      "description": "Описание",
+      "address": "Адрес",
+      "capacity": "Вместимость",
+      "price": "Цена",
+      "contacts": "Контактная информация",
+      "genre": "Категория",
+      "experience": "Опыт",
+      "specs": "Технические характеристики",
+      "namePlace": "Название заведения",
+      "namePlaceholder": "Ресторан или банкетный зал",
+      "descriptionPlace": "Описание заведения, особенности и дополнительная информация",
+      "addressPlace": "Полный адрес",
+      "capacityPlace": "Сколько человек вмещает",
+      "pricePlaceExample": "Например: 50000-100000 сом",
+      "contactsPlaceholder": "Телефон, WhatsApp или другие контакты",
+      "nameArtist": "Имя",
+      "nameArtistPlaceholder": "Ваше имя или название группы",
+      "categoryArtist": "Категория",
+      "selectCategory": "Выберите категорию",
+      "experienceArtist": "Опыт",
+      "experienceArtistPlaceholder": "Например: 5 лет",
+      "descriptionArtist": "Коротко о себе, репертуаре или услугах",
+      "priceArtistExample": "Например: 5000 сом в час",
+      "nameRental": "Название оборудования",
+      "nameRentalPlaceholder": "Название предмета для аренды",
+      "specsRental": "Технические характеристики",
+      "descriptionRental": "Дополнительная информация о предмете",
+      "priceRentalExample": "Например: 3000 сом в день"
+    },
+    "buttons": {
+      "createService": "Создать услугу",
+      "editService": "Редактировать услугу",
+      "deleteService": "Удалить услугу",
+      "saveDraft": "Сохранить черновик",
+      "loadDraft": "Загрузить черновик"
+    },
+    "messages": {
+      "createSuccess": "Услуга успешно создана",
+      "updateSuccess": "Услуга успешно обновлена",
+      "deleteSuccess": "Услуга успешно удалена",
+      "createError": "Ошибка при создании услуги",
+      "updateError": "Ошибка при обновлении услуги",
+      "deleteError": "Ошибка при удалении услуги",
+      "draftSaved": "Черновик сохранен",
+      "draftLoaded": "Черновик загружен"
+    }
+  }
+}

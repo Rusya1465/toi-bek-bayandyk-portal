@@ -4,12 +4,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlaceForm } from "@/components/partner/forms/PlaceForm";
-import { ArtistForm } from "@/components/partner/forms/ArtistForm";
-import { RentalForm } from "@/components/partner/forms/RentalForm";
-import { supabase } from "@/integrations/supabase/client";
-import { Loader } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "@/contexts/LanguageContext";
+
+// Import new step form components (we'll create these next)
+import { PlaceStepForm } from "@/components/partner/forms/PlaceStepForm";
+import { ArtistStepForm } from "@/components/partner/forms/ArtistStepForm";
+import { RentalStepForm } from "@/components/partner/forms/RentalStepForm";
 
 type ServiceType = "places" | "artists" | "rentals";
 
@@ -20,6 +23,7 @@ const ServiceFormPage = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const isEditing = !!id;
 
   useEffect(() => {
@@ -55,7 +59,7 @@ const ServiceFormPage = () => {
       if (data.owner_id !== user?.id && profile?.role !== "admin") {
         toast({
           variant: "destructive",
-          description: "Сизде бул кызматты редактирлөөгө уруксат жок",
+          description: t("services.messages.updateError"),
         });
         navigate("/profile/services");
         return;
@@ -65,7 +69,7 @@ const ServiceFormPage = () => {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        description: "Кызмат маалыматтарын алууда ката кетти: " + error.message,
+        description: t("services.messages.updateError") + ": " + error.message,
       });
       navigate("/profile/services");
     } finally {
@@ -74,14 +78,17 @@ const ServiceFormPage = () => {
   };
 
   const getFormTitle = () => {
-    const action = isEditing ? "Редактирлөө" : "Түзүү";
+    const baseKey = isEditing 
+      ? "services.editTitle"
+      : "services.createTitle";
+      
     switch (type) {
       case "artists":
-        return `Артист ${action}`;
+        return t(`${baseKey}.artists`);
       case "rentals":
-        return `Ижара ${action}`;
+        return t(`${baseKey}.rentals`);
       default:
-        return `Жай ${action}`;
+        return t(`${baseKey}.places`);
     }
   };
 
@@ -89,7 +96,7 @@ const ServiceFormPage = () => {
     return (
       <div className="flex justify-center items-center p-12">
         <Loader className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Жүктөлүүдө...</span>
+        <span className="ml-2">{t("common.loading")}</span>
       </div>
     );
   }
@@ -108,34 +115,34 @@ const ServiceFormPage = () => {
                 onClick={() => !isEditing && navigate("/create-service/places")}
                 disabled={isEditing}
               >
-                Жайлар
+                {t("catalog.categories.venues")}
               </TabsTrigger>
               <TabsTrigger
                 value="artists"
                 onClick={() => !isEditing && navigate("/create-service/artists")}
                 disabled={isEditing}
               >
-                Артисттер
+                {t("catalog.categories.artists")}
               </TabsTrigger>
               <TabsTrigger
                 value="rentals"
                 onClick={() => !isEditing && navigate("/create-service/rentals")}
                 disabled={isEditing}
               >
-                Ижара
+                {t("catalog.categories.equipment")}
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="places">
-              <PlaceForm initialData={serviceData} isEditing={isEditing} />
+              <PlaceStepForm initialData={serviceData} isEditing={isEditing} />
             </TabsContent>
 
             <TabsContent value="artists">
-              <ArtistForm initialData={serviceData} isEditing={isEditing} />
+              <ArtistStepForm initialData={serviceData} isEditing={isEditing} />
             </TabsContent>
 
             <TabsContent value="rentals">
-              <RentalForm initialData={serviceData} isEditing={isEditing} />
+              <RentalStepForm initialData={serviceData} isEditing={isEditing} />
             </TabsContent>
           </Tabs>
         </CardContent>

@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { PlacesList } from "./services/PlacesList";
 import { ArtistsList } from "./services/ArtistsList";
 import { RentalsList } from "./services/RentalsList";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 export const ServicesPanel = () => {
   const [activeTab, setActiveTab] = useState<string>("places");
@@ -20,6 +21,7 @@ export const ServicesPanel = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (user) {
@@ -62,7 +64,7 @@ export const ServicesPanel = () => {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        description: "Кызматтарды алууда ката кетти: " + error.message,
+        description: t("services.messages.updateError") + ": " + error.message,
       });
     } finally {
       setLoading(false);
@@ -76,10 +78,10 @@ export const ServicesPanel = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Менин кызматтарым</h2>
+        <h2 className="text-2xl font-semibold">{t("nav.services")}</h2>
         <Button onClick={handleCreateService}>
           <Plus className="h-4 w-4 mr-2" />
-          Жаңы кызмат кошуу
+          {t("services.buttons.createService")}
         </Button>
       </div>
 
@@ -89,9 +91,9 @@ export const ServicesPanel = () => {
         className="w-full"
       >
         <TabsList className="grid grid-cols-3 mb-4">
-          <TabsTrigger value="places">Жайлар</TabsTrigger>
-          <TabsTrigger value="artists">Артисттер</TabsTrigger>
-          <TabsTrigger value="rentals">Ижара</TabsTrigger>
+          <TabsTrigger value="places">{t("catalog.categories.venues")}</TabsTrigger>
+          <TabsTrigger value="artists">{t("catalog.categories.artists")}</TabsTrigger>
+          <TabsTrigger value="rentals">{t("catalog.categories.equipment")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="places">

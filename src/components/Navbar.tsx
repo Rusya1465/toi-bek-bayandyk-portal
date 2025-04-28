@@ -25,6 +25,8 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,18 +34,19 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleSignOut = async () => {
     try {
       await signOut();
       toast({
-        description: "Системадан ийгиликтүү чыктыңыз",
+        description: t("forms.notifications.loginSuccess"),
       });
       navigate("/");
     } catch (error) {
       toast({
         variant: "destructive",
-        description: "Ката кетти",
+        description: t("common.error"),
       });
     }
   };
@@ -84,7 +87,7 @@ const Navbar = () => {
                 isActive("/") ? "text-primary" : "text-muted-foreground"
               )}
             >
-              Башкы бет
+              {t("nav.home")}
             </Link>
             <Link
               to="/catalog"
@@ -93,7 +96,7 @@ const Navbar = () => {
                 isActive("/catalog") ? "text-primary" : "text-muted-foreground"
               )}
             >
-              Каталог
+              {t("nav.catalog")}
             </Link>
             {isAdmin && (
               <Link
@@ -103,12 +106,14 @@ const Navbar = () => {
                   isActive("/admin") ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                Админ панели
+                {t("nav.admin")}
               </Link>
             )}
           </div>
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
+          <LanguageSwitch />
+          
           {loading ? (
             <Avatar className="h-8 w-8">
               <AvatarFallback className="bg-muted">...</AvatarFallback>
@@ -122,7 +127,7 @@ const Navbar = () => {
                 >
                   <Avatar className="h-10 w-10 border">
                     {profile?.avatar_url ? (
-                      <AvatarImage src={profile.avatar_url} alt={profile.full_name || "Колдонуучу"} />
+                      <AvatarImage src={profile.avatar_url} alt={profile.full_name || t("nav.profile")} />
                     ) : null}
                     <AvatarFallback className={cn(
                       "text-background",
@@ -147,10 +152,10 @@ const Navbar = () => {
                     {profile?.role && (
                       <p className="text-xs font-medium text-primary">
                         {profile.role === "admin" 
-                          ? "Администратор" 
+                          ? t("nav.admin") 
                           : profile.role === "partner"
                           ? "Өнөктөш"
-                          : "Колдонуучу"}
+                          : t("nav.profile")}
                       </p>
                     )}
                   </div>
@@ -160,28 +165,28 @@ const Navbar = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center">
                     <User className="mr-2 h-4 w-4" />
-                    <span>Жеке кабинет</span>
+                    <span>{t("nav.profile")}</span>
                   </Link>
                 </DropdownMenuItem>
                 
                 <DropdownMenuItem asChild>
                   <Link to="/profile/settings" className="flex items-center">
                     <UserCog className="mr-2 h-4 w-4" />
-                    <span>Профиль жөндөөлөрү</span>
+                    <span>{t("nav.settings")}</span>
                   </Link>
                 </DropdownMenuItem>
                 
                 <DropdownMenuItem asChild>
                   <Link to="/profile/favorites" className="flex items-center">
                     <Heart className="mr-2 h-4 w-4" />
-                    <span>Тандалмалар</span>
+                    <span>{t("nav.favorites")}</span>
                   </Link>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
                   <Link to="/profile/history" className="flex items-center">
                     <History className="mr-2 h-4 w-4" />
-                    <span>Тарых</span>
+                    <span>{t("nav.history")}</span>
                   </Link>
                 </DropdownMenuItem>
                 
@@ -192,20 +197,20 @@ const Navbar = () => {
                     <DropdownMenuItem asChild>
                       <Link to="/create-event" className="flex items-center">
                         <Plus className="mr-2 h-4 w-4" />
-                        <span>Майрамды чогултуу</span>
+                        <span>{t("nav.createEvent")}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/apply-event" className="flex items-center">
                         <Edit className="mr-2 h-4 w-4" />
-                        <span>Майрамга арыз берүү</span>
+                        <span>{t("nav.applyEvent")}</span>
                       </Link>
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem asChild>
                       <Link to="/profile/services" className="flex items-center">
                         <ShoppingBag className="mr-2 h-4 w-4" />
-                        <span>Менин кызматтарым</span>
+                        <span>{t("nav.services")}</span>
                       </Link>
                     </DropdownMenuItem>
                     
@@ -218,7 +223,7 @@ const Navbar = () => {
                     <DropdownMenuItem asChild>
                       <Link to="/admin" className="flex items-center">
                         <Settings className="mr-2 h-4 w-4" />
-                        <span>Админ панели</span>
+                        <span>{t("nav.admin")}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -227,13 +232,13 @@ const Navbar = () => {
 
                 <DropdownMenuItem onClick={handleSignOut} className="flex items-center">
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Чыгуу</span>
+                  <span>{t("nav.logout")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Button variant="default" onClick={() => navigate("/auth")}>
-              Кирүү
+              {t("nav.login")}
             </Button>
           )}
 
@@ -258,7 +263,7 @@ const Navbar = () => {
               )}
               onClick={() => setIsMenuOpen(false)}
             >
-              Башкы бет
+              {t("nav.home")}
             </Link>
             <Link
               to="/catalog"
@@ -268,7 +273,7 @@ const Navbar = () => {
               )}
               onClick={() => setIsMenuOpen(false)}
             >
-              Каталог
+              {t("nav.catalog")}
             </Link>
             
             {user && (
@@ -281,7 +286,7 @@ const Navbar = () => {
                   )}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Жеке кабинет
+                  {t("nav.profile")}
                 </Link>
                 <Link
                   to="/profile/favorites"
@@ -291,7 +296,7 @@ const Navbar = () => {
                   )}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Тандалмалар
+                  {t("nav.favorites")}
                 </Link>
               </>
             )}
@@ -306,7 +311,7 @@ const Navbar = () => {
                   )}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Менин кызматтарым
+                  {t("nav.services")}
                 </Link>
               </>
             )}
@@ -320,7 +325,7 @@ const Navbar = () => {
                 )}
                 onClick={() => setIsMenuOpen(false)}
               >
-                Админ панели
+                {t("nav.admin")}
               </Link>
             )}
             
@@ -335,7 +340,7 @@ const Navbar = () => {
                 className="mt-2"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                Чыгуу
+                {t("nav.logout")}
               </Button>
             ) : (
               <Button
@@ -348,7 +353,7 @@ const Navbar = () => {
                 className="mt-2"
               >
                 <User className="mr-2 h-4 w-4" />
-                Кирүү
+                {t("nav.login")}
               </Button>
             )}
           </div>
