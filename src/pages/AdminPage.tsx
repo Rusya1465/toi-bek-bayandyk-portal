@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -169,11 +170,11 @@ const AdminPage = () => {
   // Update user role mutation
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      // Fixed: Properly type the RPC function parameters
-      const { data, error } = await supabase.rpc<any>('change_user_role', {
+      // Fixed: Properly provide both type parameters for rpc
+      const { data, error } = await supabase.rpc<any, ChangeUserRoleParams>('change_user_role', {
         user_id: userId,
         new_role: role
-      } as ChangeUserRoleParams);
+      });
       
       if (error) throw error;
       return data;
