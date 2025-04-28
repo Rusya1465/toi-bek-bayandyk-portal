@@ -74,7 +74,7 @@ export const StepForm: React.FC<StepFormProps> = ({
     onSubmit();
   };
 
-  // Keyboard navigation between steps - FIX: Ensure proper cleanup
+  // Keyboard navigation between steps with proper cleanup
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" && e.ctrlKey) {
@@ -84,7 +84,7 @@ export const StepForm: React.FC<StepFormProps> = ({
 
     document.addEventListener("keydown", handleKeyDown);
     
-    // Proper cleanup function
+    // Return a proper cleanup function
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };

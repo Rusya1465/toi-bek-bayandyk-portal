@@ -1,5 +1,5 @@
 
-import { useState, useRef, ChangeEvent } from "react";
+import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Loader, Upload, X } from "lucide-react";
@@ -27,22 +27,39 @@ export const ImageUpload = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
   const { toast } = useToast();
+  const intervalRef = useRef<number | null>(null);
+
+  // Clean up interval on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
 
   // Simulate progress for better UX
   const simulateProgress = () => {
     setUploadProgress(0);
-    const interval = setInterval(() => {
+    
+    // Clear any existing interval
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current);
+    }
+    
+    // Use window.setInterval and store the ID
+    intervalRef.current = window.setInterval(() => {
       setUploadProgress(prev => {
         if (prev >= 90) {
-          clearInterval(interval);
+          if (intervalRef.current !== null) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
           return prev;
         }
         return prev + 10;
       });
     }, 300);
-
-    // Clear the interval when the component unmounts
-    return () => clearInterval(interval);
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {

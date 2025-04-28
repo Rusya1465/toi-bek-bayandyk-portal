@@ -22,14 +22,14 @@ export const useFormDraft = <T extends Record<string, any>>(
           const draftData = JSON.parse(savedDraft);
           form.reset(draftData.formData);
           setInitialized(true);
-          return draftData;
         } catch (error) {
           console.error("Error loading draft:", error);
         }
       }
     }
     setInitialized(true);
-    return null;
+    
+    // No cleanup needed for this effect
   }, [isEditing, initialData, form, storageKey, initialized]);
 
   // Save draft to localStorage
