@@ -55,43 +55,50 @@ const AdminPage = () => {
 
         // Get all users that have profiles
         const userIds = profiles.map(profile => profile.id);
-        const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
         
-        if (authError) {
-          // Fallback to regular user data if admin API fails
-          const { data: userData, error: userError } = await supabase.auth.getUser();
+        try {
+          // Try to use admin API first
+          const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
           
-          if (userError) {
-            toast({
-              variant: "destructive",
-              description: "Колдонуучуларды алууда ката кетти",
+          if (!authError && authData) {
+            // If admin API worked, combine users with their profiles
+            return authData.users.map(user => {
+              const profile = profiles?.find(p => p.id === user.id);
+              return {
+                id: user.id,
+                email: user.email,
+                created_at: user.created_at,
+                profile,
+              };
             });
-            return [];
           }
-          
-          // Return just the current user with their profile
-          if (userData.user) {
-            const profile = profiles.find(p => p.id === userData.user.id);
-            return [{
-              id: userData.user.id,
-              email: userData.user.email,
-              created_at: userData.user.created_at,
-              profile
-            }];
-          }
+        } catch (adminError) {
+          console.log("Admin API not available:", adminError);
+        }
+        
+        // Fallback to regular user data if admin API fails
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        
+        if (userError) {
+          toast({
+            variant: "destructive",
+            description: "Колдонуучуларды алууда ката кетти",
+          });
           return [];
         }
-
-        // If admin API worked, combine users with their profiles
-        return authData.users.map(user => {
-          const profile = profiles?.find(p => p.id === user.id);
-          return {
-            id: user.id,
-            email: user.email,
-            created_at: user.created_at,
-            profile,
-          };
-        });
+        
+        // Return just the current user with their profile
+        if (userData.user) {
+          const profile = profiles.find(p => p.id === userData.user.id);
+          return [{
+            id: userData.user.id,
+            email: userData.user.email,
+            created_at: userData.user.created_at,
+            profile
+          }];
+        }
+        return [];
+        
       } catch (error: any) {
         toast({
           variant: "destructive",
@@ -157,9 +164,13 @@ const AdminPage = () => {
   // Update user role mutation
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+      // Fixed: Properly specify the parameter types in the rpc function
       const { data, error } = await supabase.rpc('change_user_role', {
         user_id: userId,
         new_role: role
+      } as {
+        user_id: string;
+        new_role: string;
       });
       
       if (error) throw error;
