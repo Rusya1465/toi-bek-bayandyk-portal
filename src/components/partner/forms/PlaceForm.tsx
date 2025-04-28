@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -111,6 +112,8 @@ export const PlaceForm = ({ initialData, isEditing = false }: PlaceFormProps) =>
         ...data,
         image_url: finalImageUrl,
         owner_id: user.id,
+        // Ensure name is always present and not undefined
+        name: data.name,
       };
 
       if (isEditing) {
@@ -126,10 +129,10 @@ export const PlaceForm = ({ initialData, isEditing = false }: PlaceFormProps) =>
           description: "Жай ийгиликтүү жаңыртылды",
         });
       } else {
-        // Create new place
+        // Create new place - fixed: ensuring data structure matches expected type
         const { error } = await supabase
           .from("places")
-          .insert([placeData]);  // Fix: removed the array brackets
+          .insert(placeData);
 
         if (error) throw error;
 

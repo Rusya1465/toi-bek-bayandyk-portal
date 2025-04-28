@@ -129,6 +129,8 @@ export const ArtistForm = ({ initialData, isEditing = false }: ArtistFormProps) 
         ...data,
         image_url: finalImageUrl,
         owner_id: user.id,
+        // Ensure name is always present and not undefined
+        name: data.name,
       };
 
       if (isEditing) {
@@ -144,10 +146,10 @@ export const ArtistForm = ({ initialData, isEditing = false }: ArtistFormProps) 
           description: "Артист ийгиликтүү жаңыртылды",
         });
       } else {
-        // Create new artist
+        // Create new artist - fixed: ensuring data structure matches expected type
         const { error } = await supabase
           .from("artists")
-          .insert(artistData);  // Fix: removed the array brackets
+          .insert(artistData);
 
         if (error) throw error;
 

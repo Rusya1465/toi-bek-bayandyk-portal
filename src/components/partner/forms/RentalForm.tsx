@@ -110,6 +110,8 @@ export const RentalForm = ({ initialData, isEditing = false }: RentalFormProps) 
         ...data,
         image_url: finalImageUrl,
         owner_id: user.id,
+        // Ensure name is always present and not undefined
+        name: data.name,
       };
 
       if (isEditing) {
@@ -125,10 +127,10 @@ export const RentalForm = ({ initialData, isEditing = false }: RentalFormProps) 
           description: "Ижара ийгиликтүү жаңыртылды",
         });
       } else {
-        // Create new rental
+        // Create new rental - fixed: ensuring data structure matches expected type
         const { error } = await supabase
           .from("rentals")
-          .insert([rentalData]);
+          .insert(rentalData);
 
         if (error) throw error;
 
