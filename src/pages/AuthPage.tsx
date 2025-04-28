@@ -19,6 +19,24 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const getErrorMessage = (error: any): string => {
+    const message = error?.message || "Күтүлбөгөн ката кетти";
+    
+    if (message.includes("Invalid login credentials")) {
+      return "Туура эмес электрондук почта же сырсөз";
+    } else if (message.includes("Email not confirmed")) {
+      return "Электрондук почтаңызды тастыктаңыз";
+    } else if (message.includes("User already registered")) {
+      return "Бул электрондук почта менен катталган колдонуучу бар";
+    } else if (message.includes("Email rate limit exceeded")) {
+      return "Өтө көп аракет кылдыңыз. Кийинчерээк кайра аракет кылыңыз";
+    } else if (message.includes("Password should be")) {
+      return "Сырсөз эң аз дегенде 6 белги болушу керек";
+    }
+    
+    return message;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -35,6 +53,7 @@ const AuthPage = () => {
             variant: "destructive",
             description: "Толук атыңызды киргизиңиз",
           });
+          setLoading(false);
           return;
         }
         await signUp(email, password, fullName);
@@ -44,9 +63,10 @@ const AuthPage = () => {
       }
       navigate("/");
     } catch (error) {
+      console.error("Auth error:", error);
       toast({
         variant: "destructive",
-        description: error instanceof Error ? error.message : "Ката кетти",
+        description: getErrorMessage(error),
       });
     } finally {
       setLoading(false);

@@ -1,12 +1,13 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { User } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type { AuthState, Profile } from "@/lib/types/auth";
 
 const AuthContext = createContext<{
   user: User | null;
   profile: Profile | null;
+  session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
@@ -14,6 +15,7 @@ const AuthContext = createContext<{
 }>({
   user: null,
   profile: null,
+  session: null,
   loading: true,
   signIn: async () => {},
   signUp: async () => {},
@@ -21,18 +23,40 @@ const AuthContext = createContext<{
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [authState, setAuthState] = useState<AuthState>({
+  const [authState, setAuthState] = useState<AuthState & { session: Session | null }>({
     user: null,
     profile: null,
+    session: null,
     loading: true,
   });
 
   useEffect(() => {
-    // Initial session check
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setAuthState(prev => ({
+          ...prev,
+          user: session?.user ?? null,
+          session: session,
+        }));
+
+        if (session?.user) {
+          // Defer profile fetch to avoid potential deadlock
+          setTimeout(() => {
+            fetchProfile(session.user.id);
+          }, 0);
+        } else {
+          setAuthState(prev => ({ ...prev, profile: null }));
+        }
+      }
+    );
+
+    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setAuthState(prev => ({
         ...prev,
         user: session?.user ?? null,
+        session: session,
         loading: false,
       }));
 
@@ -40,22 +64,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         fetchProfile(session.user.id);
       }
     });
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setAuthState(prev => ({
-          ...prev,
-          user: session?.user ?? null,
-        }));
-
-        if (session?.user) {
-          fetchProfile(session.user.id);
-        } else {
-          setAuthState(prev => ({ ...prev, profile: null }));
-        }
-      }
-    );
 
     return () => subscription.unsubscribe();
   }, []);
@@ -65,7 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .from("profiles")
       .select("*")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     if (!error && data) {
       setAuthState(prev => ({ ...prev, profile: data as Profile }));
