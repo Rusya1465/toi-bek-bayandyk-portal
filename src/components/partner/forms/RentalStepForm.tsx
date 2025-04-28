@@ -14,7 +14,8 @@ import { BasicInfoStep } from "../step-forms/BasicInfoStep";
 import { ImageStep } from "../step-forms/ImageStep";
 import { DescriptionStep } from "../step-forms/DescriptionStep";
 import { ContactsStep } from "../step-forms/ContactsStep";
-import { uploadFileWithProgress } from "@/lib/storage-utils";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { useFormDraft } from "@/hooks/useFormDraft";
 
 // Define schema
 const rentalSchema = z.object({
@@ -37,10 +38,6 @@ const DRAFT_STORAGE_KEY = "rental-form-draft";
 
 export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormProps) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(initialData?.image_url || null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState<boolean>(false);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -58,84 +55,41 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
     },
   });
 
+  // Use custom hooks
+  const { 
+    imageUrl, 
+    imageFile, 
+    uploading, 
+    handleImageChange, 
+    handleImageRemove, 
+    uploadImage, 
+    initializeImage,
+    setImageUrl
+  } = useImageUpload();
+
+  const { saveDraft, loadDraft, clearDraft } = useFormDraft(
+    DRAFT_STORAGE_KEY,
+    form,
+    initialData,
+    isEditing
+  );
+
+  // Watch fields for validation
   const watchName = form.watch("name");
-  const watchSpecs = form.watch("specs");
-  const watchDescription = form.watch("description");
 
-  // Load draft from localStorage on mount
+  // Initialize imageUrl with initial data
   useEffect(() => {
-    if (!isEditing && !initialData) {
-      const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
-      if (savedDraft) {
-        try {
-          const draftData = JSON.parse(savedDraft);
-          form.reset(draftData.formData);
-          if (draftData.imageUrl) {
-            setImageUrl(draftData.imageUrl);
-          }
-        } catch (error) {
-          console.error("Error loading draft:", error);
-        }
-      }
+    if (initialData?.image_url) {
+      initializeImage(initialData.image_url);
     }
-  }, [isEditing, initialData, form]);
+  }, [initialData]);
 
-  // Save draft to localStorage
-  const saveDraft = () => {
-    if (!isEditing) {
-      const formData = form.getValues();
-      const draftData = {
-        formData,
-        imageUrl
-      };
-      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draftData));
-    }
+  const handleFormSaveDraft = () => {
+    saveDraft(imageUrl);
   };
 
-  // Load draft from localStorage
-  const loadDraft = () => {
-    const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
-    if (savedDraft) {
-      try {
-        const draftData = JSON.parse(savedDraft);
-        form.reset(draftData.formData);
-        if (draftData.imageUrl) {
-          setImageUrl(draftData.imageUrl);
-        }
-        toast({
-          description: t("services.messages.draftLoaded"),
-        });
-      } catch (error) {
-        console.error("Error loading draft:", error);
-        toast({
-          variant: "destructive",
-          description: "Error loading draft",
-        });
-      }
-    } else {
-      toast({
-        variant: "destructive",
-        description: "No saved draft found",
-      });
-    }
-  };
-
-  const handleImageChange = (file: File | null) => {
-    if (file) {
-      // Preview the image
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-
-      setImageFile(file);
-    }
-  };
-
-  const handleImageRemove = () => {
-    setImageUrl(null);
-    setImageFile(null);
+  const handleFormLoadDraft = () => {
+    loadDraft(setImageUrl);
   };
 
   const onSubmit = async () => {
@@ -149,20 +103,9 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
       // Upload image if there's a new one
       let finalImageUrl = imageUrl;
       if (imageFile) {
-        setUploading(true);
-        finalImageUrl = await uploadFileWithProgress(
-          imageFile,
-          "service-images",
-          user.id,
-          (progress) => setUploadProgress(progress)
-        );
-        setUploading(false);
+        finalImageUrl = await uploadImage();
         
         if (!finalImageUrl) {
-          toast({
-            variant: "destructive",
-            description: t("forms.imageUpload.error"),
-          });
           setLoading(false);
           return;
         }
@@ -200,7 +143,7 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
         });
         
         // Clear draft after successful submission
-        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        clearDraft();
       }
 
       navigate("/profile/services");
@@ -281,8 +224,8 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
         onSubmit={onSubmit}
         formId="rental-form"
         loading={loading || uploading}
-        saveDraft={!isEditing ? saveDraft : undefined}
-        loadDraft={!isEditing ? loadDraft : undefined}
+        saveDraft={!isEditing ? handleFormSaveDraft : undefined}
+        loadDraft={!isEditing ? handleFormLoadDraft : undefined}
       />
     </Form>
   );
