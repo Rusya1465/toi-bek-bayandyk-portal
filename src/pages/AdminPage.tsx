@@ -126,7 +126,7 @@ const AdminPage = () => {
   };
 
   // Delete catalog item
-  const deleteCatalogItem = async (table: string, id: string) => {
+  const deleteCatalogItem = async (table: 'places' | 'artists' | 'rentals', id: string) => {
     try {
       const { error } = await supabase
         .from(table)

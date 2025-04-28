@@ -3,7 +3,7 @@ import { useState } from "react";
 
 export const useCatalogFilters = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [priceSort, setPriceSort] = useState("");
+  const [priceSort, setPriceSort] = useState("default");
 
   const filterItems = <T extends { name: string; description?: string; price?: string }>(
     items: T[]

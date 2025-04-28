@@ -40,7 +40,7 @@ export const FilterControls = ({
             <SelectValue placeholder="Баасы боюнча" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Баасы боюнча</SelectItem>
+            <SelectItem value="default">Баасы боюнча</SelectItem>
             <SelectItem value="asc">Арзандан кымбатка</SelectItem>
             <SelectItem value="desc">Кымбаттан арзанга</SelectItem>
           </SelectContent>
