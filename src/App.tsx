@@ -16,8 +16,16 @@ import PlaceDetailPage from "./pages/PlaceDetailPage";
 import ArtistDetailPage from "./pages/ArtistDetailPage";
 import RentalDetailPage from "./pages/RentalDetailPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ServiceFormPage from "./pages/ServiceFormPage";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    }
+  }
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -61,6 +69,19 @@ const App = () => (
                   <ProfilePage />
                 </ProtectedRoute>
               } />
+              
+              {/* Service creation and editing routes */}
+              <Route path="create-service/:type" element={
+                <ProtectedRoute roles={['partner', 'admin']}>
+                  <ServiceFormPage />
+                </ProtectedRoute>
+              } />
+              <Route path="edit-service/:type/:id" element={
+                <ProtectedRoute roles={['partner', 'admin']}>
+                  <ServiceFormPage />
+                </ProtectedRoute>
+              } />
+              
               <Route path="admin" element={
                 <ProtectedRoute roles={['admin']}>
                   <AdminPage />

@@ -10,17 +10,61 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+// Form validation schemas
+const loginSchema = z.object({
+  email: z.string().email("Туура эмес электрондук почта"),
+  password: z.string().min(6, "Сырсөз эң аз дегенде 6 белги болушу керек"),
+  rememberMe: z.boolean().default(true),
+});
+
+const registerSchema = z.object({
+  fullName: z.string().min(2, "Толук атыңыз эң аз дегенде 2 белги болушу керек"),
+  email: z.string().email("Туура эмес электрондук почта"),
+  password: z.string().min(6, "Сырсөз эң аз дегенде 6 белги болушу керек"),
+});
+
+const resetSchema = z.object({
+  resetEmail: z.string().email("Туура эмес электрондук почта"),
+});
 
 const AuthPage = () => {
   // Form states
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [rememberMe, setRememberMe] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
   const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  // Login form
+  const loginForm = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: true,
+    },
+  });
+
+  // Register form
+  const registerForm = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      password: "",
+    },
+  });
+
+  // Reset password form
+  const resetForm = useForm<z.infer<typeof resetSchema>>({
+    resolver: zodResolver(resetSchema),
+    defaultValues: {
+      resetEmail: "",
+    },
+  });
   
   const { signIn, signUp, requestPasswordReset } = useAuth();
   const navigate = useNavigate();
@@ -44,28 +88,11 @@ const AuthPage = () => {
     return message;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLoginSubmit = async (values: z.infer<typeof loginSchema>) => {
     setLoading(true);
 
     try {
-      if (activeTab === "login") {
-        await signIn(email, password, rememberMe);
-      } else {
-        if (!fullName) {
-          toast({
-            variant: "destructive",
-            description: "Толук атыңызды киргизиңиз",
-          });
-          setLoading(false);
-          return;
-        }
-        await signUp(email, password, fullName);
-        toast({
-          description: "Каттоо ийгиликтүү болду. Эми кирсеңиз болот.",
-        });
-        setActiveTab("login");
-      }
+      await signIn(values.email, values.password, values.rememberMe);
     } catch (error) {
       console.error("Auth error:", error);
       toast({
@@ -77,12 +104,32 @@ const AuthPage = () => {
     }
   };
 
-  const handlePasswordReset = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRegisterSubmit = async (values: z.infer<typeof registerSchema>) => {
+    setLoading(true);
+
+    try {
+      await signUp(values.email, values.password, values.fullName);
+      toast({
+        description: "Каттоо ийгиликтүү болду. Эми кирсеңиз болот.",
+      });
+      setActiveTab("login");
+      loginForm.setValue("email", values.email);
+    } catch (error) {
+      console.error("Auth error:", error);
+      toast({
+        variant: "destructive",
+        description: getErrorMessage(error),
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async (values: z.infer<typeof resetSchema>) => {
     setLoading(true);
     
     try {
-      await requestPasswordReset(resetEmail);
+      await requestPasswordReset(values.resetEmail);
       toast({
         description: "Сырсөздү калыбына келтирүү үчүн электрондук почтаңызды текшериңиз",
       });
@@ -111,29 +158,37 @@ const AuthPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handlePasswordReset} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="reset-email">Email</Label>
-                <Input
-                  id="reset-email"
-                  type="email"
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                  disabled={loading}
-                  required
+            <Form {...resetForm}>
+              <form onSubmit={resetForm.handleSubmit(handlePasswordReset)} className="space-y-4">
+                <FormField
+                  control={resetForm.control}
+                  name="resetEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader className="mr-2 h-4 w-4 animate-spin" />
-                    Жөнөтүлүүдө...
-                  </>
-                ) : (
-                  "Шилтеме жөнөтүү"
-                )}
-              </Button>
-            </form>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      Жөнөтүлүүдө...
+                    </>
+                  ) : (
+                    "Шилтеме жөнөтүү"
+                  )}
+                </Button>
+              </form>
+            </Form>
           </CardContent>
           <CardFooter className="flex justify-center">
             <Button 
@@ -170,111 +225,150 @@ const AuthPage = () => {
             </TabsList>
             
             <TabsContent value="login">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                    required
+              <Form {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-4">
+                  <FormField
+                    control={loginForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            disabled={loading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Сырсөз</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                    required
+                  <FormField
+                    control={loginForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Сырсөз</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            disabled={loading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="remember-me" 
-                      checked={rememberMe}
-                      onCheckedChange={() => setRememberMe(!rememberMe)}
+                  <div className="flex items-center justify-between">
+                    <FormField
+                      control={loginForm.control}
+                      name="rememberMe"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">
+                            Мени эстеп калуу
+                          </FormLabel>
+                        </FormItem>
+                      )}
                     />
-                    <Label htmlFor="remember-me" className="text-sm">
-                      Мени эстеп калуу
-                    </Label>
+                    <Button 
+                      variant="link" 
+                      className="p-0 h-auto text-sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsResettingPassword(true);
+                      }}
+                    >
+                      Сырсөздү унуттуңузбу?
+                    </Button>
                   </div>
-                  <Button 
-                    variant="link" 
-                    className="p-0 h-auto text-sm"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsResettingPassword(true);
-                    }}
-                  >
-                    Сырсөздү унуттуңузбу?
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader className="mr-2 h-4 w-4 animate-spin" />
+                        Кирүүдө...
+                      </>
+                    ) : (
+                      "Кирүү"
+                    )}
                   </Button>
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <Loader className="mr-2 h-4 w-4 animate-spin" />
-                      Кирүүдө...
-                    </>
-                  ) : (
-                    "Кирүү"
-                  )}
-                </Button>
-              </form>
+                </form>
+              </Form>
             </TabsContent>
             
             <TabsContent value="register">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Толук аты-жөнүңүз</Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    disabled={loading}
-                    required
+              <Form {...registerForm}>
+                <form onSubmit={registerForm.handleSubmit(handleRegisterSubmit)} className="space-y-4">
+                  <FormField
+                    control={registerForm.control}
+                    name="fullName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Толук аты-жөнүңүз</FormLabel>
+                        <FormControl>
+                          <Input
+                            disabled={loading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email-register">Email</Label>
-                  <Input
-                    id="email-register"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                    required
+                  <FormField
+                    control={registerForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            disabled={loading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password-register">Сырсөз</Label>
-                  <Input
-                    id="password-register"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                    required
-                    minLength={6}
+                  <FormField
+                    control={registerForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Сырсөз</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            disabled={loading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <Loader className="mr-2 h-4 w-4 animate-spin" />
-                      Каттоодо...
-                    </>
-                  ) : (
-                    "Катталуу"
-                  )}
-                </Button>
-              </form>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader className="mr-2 h-4 w-4 animate-spin" />
+                        Каттоодо...
+                      </>
+                    ) : (
+                      "Катталуу"
+                    )}
+                  </Button>
+                </form>
+              </Form>
             </TabsContent>
           </Tabs>
         </CardContent>
