@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -22,12 +22,12 @@ const Navbar = () => {
   const isMobile = useIsMobile();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   
-  // Закрываем меню при изменении маршрута
+  // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
-  // Блокируем скролл при открытом меню
+  // Block scroll when menu is open
   useEffect(() => {
     if (isMenuOpen) {
       document.body.classList.add('mobile-menu-open');
@@ -35,7 +35,7 @@ const Navbar = () => {
       document.body.classList.remove('mobile-menu-open');
     }
     
-    // Очищаем при размонтировании
+    // Cleanup on unmount
     return () => {
       document.body.classList.remove('mobile-menu-open');
     };
@@ -63,15 +63,15 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  // Упрощенная функция переключения меню
+  // Simple toggle function
   const toggleMenu = () => {
-    setIsMenuOpen(prevState => !prevState);
+    setIsMenuOpen(!isMenuOpen);
   };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        {/* Логотип */}
+        {/* Logo */}
         <div className="flex items-center">
           <Link to="/" className="flex items-center" onClick={() => setIsMenuOpen(false)}>
             <span className="inline-block font-bold text-xl text-kyrgyz-red">
@@ -80,14 +80,14 @@ const Navbar = () => {
           </Link>
         </div>
         
-        {/* Десктопная навигация */}
+        {/* Desktop nav */}
         <DesktopNav isActive={isActive} isAdmin={isAdmin} />
         
-        {/* Правая часть навигации (языки, профиль) */}
+        {/* Right navigation (languages, profile) */}
         <div className="flex items-center space-x-2 md:space-x-4">
           <LanguageSwitch />
           
-          {/* Профиль пользователя */}
+          {/* User profile */}
           {loading ? (
             <div className="h-8 w-8 rounded-full bg-muted animate-pulse"></div>
           ) : user ? (
@@ -109,7 +109,7 @@ const Navbar = () => {
             </Button>
           )}
 
-          {/* Кнопка мобильного меню - максимально упрощена */}
+          {/* Mobile menu button - simplified */}
           <Button
             ref={menuButtonRef}
             variant="ghost"
@@ -118,6 +118,7 @@ const Navbar = () => {
             onClick={toggleMenu}
             aria-label={isMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
             aria-expanded={isMenuOpen}
+            type="button"
           >
             {isMenuOpen ? (
               <X className="h-5 w-5" />
@@ -128,7 +129,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Мобильное меню */}
+      {/* Mobile menu */}
       <NavbarMenu 
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}

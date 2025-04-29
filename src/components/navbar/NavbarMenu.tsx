@@ -24,11 +24,13 @@ const NavbarMenu = ({
   const { t } = useTranslation();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Улучшенная обработка событий и закрытие меню при клике вне
+  // Event handlers for closing menu on click outside
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
-      // Проверяем, что меню открыто и клик был вне меню
-      if (isMenuOpen && menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      // Check if menu is open and click was outside menu
+      if (isMenuOpen && 
+          menuRef.current && 
+          !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
     };
@@ -40,34 +42,39 @@ const NavbarMenu = ({
     };
 
     if (isMenuOpen) {
-      document.addEventListener('mousedown', handleOutsideClick);
-      document.addEventListener('touchstart', handleOutsideClick);
-      document.addEventListener('keydown', handleEscapeKey);
+      // Add event listeners with a small delay to prevent immediate triggering
+      const timer = setTimeout(() => {
+        document.addEventListener('mousedown', handleOutsideClick);
+        document.addEventListener('touchstart', handleOutsideClick);
+        document.addEventListener('keydown', handleEscapeKey);
+      }, 100);
+      
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener('mousedown', handleOutsideClick);
+        document.removeEventListener('touchstart', handleOutsideClick);
+        document.removeEventListener('keydown', handleEscapeKey);
+      };
     }
-
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-      document.removeEventListener('touchstart', handleOutsideClick);
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
+    
+    return undefined;
   }, [isMenuOpen, setIsMenuOpen]);
 
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
 
-  // Упрощенное отображение меню с улучшенными анимациями
   return (
     <div 
       id="mobile-menu"
       ref={menuRef}
       className={cn(
         "fixed top-16 left-0 right-0 bottom-0 z-40 bg-background/95 backdrop-blur", 
+        "transition-all duration-200 ease-in-out",
+        "md:hidden",
         isMenuOpen 
           ? "opacity-100 pointer-events-auto" 
-          : "opacity-0 pointer-events-none",
-        "transition-opacity duration-200 ease-in-out",
-        "md:hidden"
+          : "opacity-0 pointer-events-none"
       )}
       aria-hidden={!isMenuOpen}
     >
