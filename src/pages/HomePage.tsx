@@ -50,7 +50,7 @@ const HomePage = () => {
   return (
     <div className="animate-fade-in">
       {/* Hero Banner with Mountain Background */}
-      <section className="relative overflow-hidden kyrgyz-pattern">
+      <section className="relative overflow-hidden kyrgyz-pattern h-[60vh] md:h-[70vh]">
         <div 
           className="absolute inset-0 bg-cover bg-center -z-10" 
           style={{ 
@@ -59,10 +59,10 @@ const HomePage = () => {
             backgroundSize: "cover"
           }}
         >
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
+          <div className="absolute inset-0 bg-black/50"></div>
         </div>
-        <div className="container px-4 py-16 md:py-32 flex flex-col items-center text-center">
-          <div className="w-full max-w-xl mx-auto space-y-3 md:space-y-4 relative z-10">
+        <div className="container px-4 h-full flex flex-col items-center justify-center text-center">
+          <div className="w-full max-w-xl mx-auto space-y-4 md:space-y-6 relative z-10">
             <h1 className="text-2xl md:text-3xl lg:text-5xl font-bold tracking-tighter text-white">
               {t("home.hero.title")} - <span className="text-kyrgyz-red">{t("home.hero.subtitle")}</span>
             </h1>
