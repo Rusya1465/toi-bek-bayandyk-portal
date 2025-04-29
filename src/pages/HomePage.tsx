@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -48,22 +49,22 @@ const HomePage = () => {
 
   return (
     <div className="animate-fade-in">
-      {/* Hero Banner with Mountain Background */}
+      {/* Hero Banner with Kyrgyz Themed Gradient Background */}
       <section className="relative overflow-hidden kyrgyz-pattern h-[60vh] md:h-[70vh]">
         <div 
-          className="absolute inset-0 bg-cover bg-center -z-10" 
+          className="absolute inset-0 -z-10" 
           style={{ 
-            backgroundImage: "url('/lovable-uploads/5fac647b-cc7a-43c0-8a05-2907bbbd454e.png')",
-            backgroundPosition: "center bottom",
-            backgroundSize: "cover"
+            background: "linear-gradient(135deg, #ea384c 0%, #1e3a8a 100%)",
+            opacity: 0.85
           }}
         >
-          <div className="absolute inset-0 bg-black/50"></div>
+          {/* Kyrgyz pattern overlay */}
+          <div className="absolute inset-0 bg-black/30 kyrgyz-ornament"></div>
         </div>
         <div className="container px-4 h-full flex flex-col items-center justify-center text-center">
           <div className="w-full max-w-xl mx-auto space-y-4 md:space-y-6 relative z-10">
             <h1 className="text-2xl md:text-3xl lg:text-5xl font-bold tracking-tighter text-white">
-              {t("home.hero.title")} - <span className="text-kyrgyz-red">{t("home.hero.subtitle")}</span>
+              {t("home.hero.title")} - <span className="text-kyrgyz-yellow">{t("home.hero.subtitle")}</span>
             </h1>
             <p className="text-white/90 text-base md:text-lg lg:text-xl">
               {t("home.hero.description")}
