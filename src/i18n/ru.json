@@ -1,4 +1,3 @@
-
 {
   "common": {
     "appName": "ToiBek",
@@ -30,7 +29,10 @@
     "login": "Войти",
     "logout": "Выйти",
     "createEvent": "Создать мероприятие",
-    "applyEvent": "Подать заявку на мероприятие"
+    "applyEvent": "Подать заявку на мероприятие",
+    "openMenu": "Открыть меню",
+    "closeMenu": "Закрыть меню",
+    "mobileMenu": "Мобильное меню"
   },
   "home": {
     "hero": {
