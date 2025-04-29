@@ -16,6 +16,7 @@ import { useTranslation } from "@/contexts/LanguageContext";
 interface NavbarMenuProps {
   isMenuOpen: boolean;
   setIsMenuOpen: (isOpen: boolean) => void;
+  toggleMenu: (e?: React.MouseEvent | React.TouchEvent) => void;
   isAdmin: boolean;
   isPartner: boolean;
   handleSignOut: () => void;
@@ -25,6 +26,7 @@ interface NavbarMenuProps {
 const NavbarMenu = ({
   isMenuOpen,
   setIsMenuOpen,
+  toggleMenu,
   isAdmin,
   isPartner,
   handleSignOut,
@@ -36,20 +38,35 @@ const NavbarMenu = ({
 
   // Handle touch events and close menu when clicking outside
   useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
+    const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        console.log("Outside click detected, closing menu");
+        setIsMenuOpen(false);
+      }
+    };
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isMenuOpen) {
+        console.log("Escape key pressed, closing menu");
         setIsMenuOpen(false);
       }
     };
 
     if (isMenuOpen) {
-      document.addEventListener('mousedown', handleOutsideClick);
-      document.addEventListener('touchstart', handleOutsideClick);
+      // Use capture phase to ensure we get the event first
+      document.addEventListener('mousedown', handleOutsideClick, { capture: true });
+      document.addEventListener('touchstart', handleOutsideClick, { capture: true, passive: true });
+      document.addEventListener('keydown', handleEscapeKey);
+      
+      // Log that listeners are added
+      console.log("Menu event listeners added");
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-      document.removeEventListener('touchstart', handleOutsideClick);
+      document.removeEventListener('mousedown', handleOutsideClick, { capture: true });
+      document.removeEventListener('touchstart', handleOutsideClick, { capture: true });
+      document.removeEventListener('keydown', handleEscapeKey);
+      console.log("Menu event listeners removed");
     };
   }, [isMenuOpen, setIsMenuOpen]);
 
@@ -60,16 +77,20 @@ const NavbarMenu = ({
   // We always render the menu but control visibility with CSS
   return (
     <div 
+      id="mobile-menu"
       ref={menuRef}
       className={cn(
-        "fixed inset-0 top-16 z-40 bg-background border-t overflow-y-auto pb-safe md:hidden",
-        isMenuOpen ? "block animate-fade-in" : "hidden"
+        "mobile-menu", 
+        isMenuOpen ? "mobile-menu-visible animate-fade-in" : "mobile-menu-hidden",
+        "md:hidden"
       )}
       aria-hidden={!isMenuOpen}
       role="dialog"
       aria-modal="true"
+      aria-labelledby="mobile-menu-heading"
     >
-      <div className="container py-6 space-y-6">
+      <div className="container py-6 space-y-6 overflow-y-auto h-full pb-safe">
+        <h2 id="mobile-menu-heading" className="sr-only">{t("nav.mobileMenu")}</h2>
         <nav className="space-y-4">
           <Link
             to="/"
@@ -193,7 +214,7 @@ const NavbarMenu = ({
               handleSignOut();
               setIsMenuOpen(false);
             }}
-            className="w-full flex items-center justify-center h-12 px-4 py-2 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+            className="w-full flex items-center justify-center h-12 px-4 py-2 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground touch-manipulation"
           >
             <LogOut className="mr-2 h-4 w-4" />
             {t("nav.logout")}
@@ -202,7 +223,7 @@ const NavbarMenu = ({
           <Link
             to="/auth"
             onClick={() => setIsMenuOpen(false)}
-            className="w-full flex items-center justify-center h-12 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+            className="w-full flex items-center justify-center h-12 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 touch-manipulation"
           >
             <User className="mr-2 h-4 w-4" />
             {t("nav.login")}

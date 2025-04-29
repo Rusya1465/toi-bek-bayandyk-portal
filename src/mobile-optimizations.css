@@ -88,6 +88,13 @@ select {
   overscroll-behavior-y: contain;
 }
 
+/* Mobile menu specific styles */
+.mobile-menu {
+  transform-origin: top center;
+  will-change: transform, opacity;
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS */
+}
+
 /* Override focus outline on mobile */
 @media (max-width: 768px) {
   *:focus {
@@ -99,9 +106,12 @@ select {
     outline-offset: 2px;
   }
   
-  /* Improve mobile menu performance */
+  /* Improved Mobile Menu */
   .mobile-menu-open {
     overflow: hidden !important;
+    position: fixed;
+    width: 100%;
+    height: 100%;
   }
   
   /* Enhanced Mobile Menu */
@@ -120,12 +130,20 @@ select {
     opacity: 0;
     transform: translateY(-10px);
     pointer-events: none;
+    visibility: hidden;
   }
   
   .mobile-menu-visible {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+    visibility: visible;
+  }
+  
+  /* Enhance the menu toggle button */
+  .menu-toggle-button {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -142,11 +160,6 @@ select {
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* Active mobile menu styles */
-.menu-active {
-  display: block !important;
-}
-
 /* Mobile menu backdrop */
 .mobile-menu-backdrop {
   position: fixed;
@@ -156,4 +169,6 @@ select {
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 39;
+  touch-action: none; /* Prevent scrolling when menu is open */
+  -webkit-tap-highlight-color: transparent;
 }

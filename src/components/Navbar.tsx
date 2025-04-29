@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -20,6 +20,7 @@ const Navbar = () => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   // Close menu when route changes
   useEffect(() => {
@@ -29,16 +30,17 @@ const Navbar = () => {
     }
   }, [location.pathname]);
 
-  // Handle body scroll locking
+  // Handle body scroll locking with improved implementation
   useEffect(() => {
     if (isMenuOpen) {
       document.body.classList.add('mobile-menu-open');
-      console.log("Menu opened, body scroll locked");
+      console.log("Menu opened, body scroll locked", document.body.classList);
     } else {
       document.body.classList.remove('mobile-menu-open');
-      console.log("Menu closed, body scroll unlocked");
+      console.log("Menu closed, body scroll unlocked", document.body.classList);
     }
     
+    // Always clean up on unmount
     return () => {
       document.body.classList.remove('mobile-menu-open');
       console.log("Cleanup: body scroll restored");
@@ -67,16 +69,17 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  const toggleMenu = useCallback((e?: React.MouseEvent) => {
-    // Prevent default and stop propagation to ensure the event doesn't bubble
+  // Improved toggle function with better event handling
+  const toggleMenu = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
     if (e) {
+      // Prevent default and stop propagation to ensure the event doesn't bubble
       e.preventDefault();
       e.stopPropagation();
     }
     
     setIsMenuOpen(prevState => {
       const newState = !prevState;
-      console.log("Menu toggled, new state:", newState);
+      console.log("Menu toggled, new state:", newState, "Event type:", e?.type);
       return newState;
     });
   }, []);
@@ -122,39 +125,52 @@ const Navbar = () => {
             </Button>
           )}
 
-          {/* Кнопка мобильного меню */}
+          {/* Кнопка мобильного меню - improved with ref and additional classes */}
           <Button
+            ref={menuButtonRef}
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="md:hidden menu-toggle-button touch-manipulation"
             onClick={toggleMenu}
+            onTouchEnd={(e) => {
+              // Handle touch events separately for mobile
+              e.preventDefault();
+              toggleMenu(e);
+            }}
             aria-label={isMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
             aria-expanded={isMenuOpen}
+            aria-haspopup="true"
+            aria-controls="mobile-menu"
           >
             {isMenuOpen ? (
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5" aria-hidden="true" />
             ) : (
-              <Menu className="h-5 w-5" />
+              <Menu className="h-5 w-5" aria-hidden="true" />
             )}
           </Button>
         </div>
       </div>
 
-      {/* Мобильное меню - always rendered but conditionally shown */}
+      {/* Мобильное меню - always rendered with conditional CSS classes */}
       <NavbarMenu 
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
+        toggleMenu={toggleMenu}
         isAdmin={isAdmin}
         isPartner={isPartner}
         handleSignOut={handleSignOut}
         user={user}
       />
       
-      {/* Backdrop for closing the menu when clicking outside */}
+      {/* Backdrop for closing the menu when clicking outside - improved with touchend */}
       {isMenuOpen && (
         <div 
           className="mobile-menu-backdrop md:hidden" 
           onClick={toggleMenu}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            toggleMenu(e);
+          }}
           aria-hidden="true"
         />
       )}
