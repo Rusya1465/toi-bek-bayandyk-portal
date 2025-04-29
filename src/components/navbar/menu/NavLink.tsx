@@ -1,0 +1,25 @@
+
+import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+
+interface NavLinkProps {
+  to: string;
+  isActive: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}
+
+const NavLink = ({ to, isActive, onClick, children }: NavLinkProps) => (
+  <Link
+    to={to}
+    className={cn(
+      "flex items-center py-3 px-2 text-lg font-medium rounded-md transition-colors", 
+      isActive ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted/50"
+    )}
+    onClick={onClick}
+  >
+    {children}
+  </Link>
+);
+
+export default NavLink;
