@@ -22,30 +22,22 @@ const Navbar = () => {
   const isMobile = useIsMobile();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   
-  // Улучшенная обработка изменения маршрута
+  // Закрываем меню при изменении маршрута
   useEffect(() => {
-    if (isMenuOpen) {
-      setIsMenuOpen(false);
-      console.log("Route changed, menu closed");
-    }
+    setIsMenuOpen(false);
   }, [location.pathname]);
 
-  // Улучшенная блокировка скролла с проверкой на наличие класса
+  // Блокируем скролл при открытом меню
   useEffect(() => {
     if (isMenuOpen) {
-      if (!document.body.classList.contains('mobile-menu-open')) {
-        document.body.classList.add('mobile-menu-open');
-        console.log("Menu opened, body scroll locked", document.body.classList);
-      }
+      document.body.classList.add('mobile-menu-open');
     } else {
       document.body.classList.remove('mobile-menu-open');
-      console.log("Menu closed, body scroll unlocked", document.body.classList);
     }
     
-    // Всегда очищаем при размонтировании
+    // Очищаем при размонтировании
     return () => {
       document.body.classList.remove('mobile-menu-open');
-      console.log("Cleanup: body scroll restored");
     };
   }, [isMenuOpen]);
 
@@ -71,27 +63,9 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  // Полностью переработанная функция переключения меню
-  const toggleMenu = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
-    if (e) {
-      // Предотвращаем всплытие события
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    
-    // Используем функциональное обновление с логированием
-    setIsMenuOpen(prevState => {
-      const newState = !prevState;
-      console.log("Menu toggled, new state:", newState, "Event type:", e?.type);
-      return newState;
-    });
-  }, []);
-
-  // Обработчик клика по бургеру с минимальной логикой для максимальной надежности
-  const handleMenuClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleMenu(e);
+  // Упрощенная функция переключения меню
+  const toggleMenu = () => {
+    setIsMenuOpen(prevState => !prevState);
   };
 
   return (
@@ -135,27 +109,21 @@ const Navbar = () => {
             </Button>
           )}
 
-          {/* Кнопка мобильного меню - упрощена для максимальной надежности */}
+          {/* Кнопка мобильного меню - максимально упрощена */}
           <Button
             ref={menuButtonRef}
             variant="ghost"
             size="icon"
-            className="md:hidden focus-visible:ring-2 focus-visible:ring-primary"
-            onClick={handleMenuClick}
+            className="md:hidden"
+            onClick={toggleMenu}
             aria-label={isMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
             aria-expanded={isMenuOpen}
-            aria-haspopup="true"
-            aria-controls="mobile-menu"
-            data-state={isMenuOpen ? "open" : "closed"}
           >
             {isMenuOpen ? (
-              <X className="h-5 w-5" aria-hidden="true" />
+              <X className="h-5 w-5" />
             ) : (
-              <Menu className="h-5 w-5" aria-hidden="true" />
+              <Menu className="h-5 w-5" />
             )}
-            <span className="sr-only">
-              {isMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
-            </span>
           </Button>
         </div>
       </div>
@@ -164,7 +132,6 @@ const Navbar = () => {
       <NavbarMenu 
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
-        toggleMenu={toggleMenu}
         isAdmin={isAdmin}
         isPartner={isPartner}
         handleSignOut={handleSignOut}
