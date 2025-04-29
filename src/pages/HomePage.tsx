@@ -49,18 +49,28 @@ const HomePage = () => {
 
   return (
     <div className="animate-fade-in">
-      {/* Hero Banner */}
+      {/* Hero Banner with Mountain Background */}
       <section className="relative overflow-hidden kyrgyz-pattern">
-        <div className="container px-4 py-12 md:py-24 flex flex-col items-center text-center">
-          <div className="w-full max-w-xl mx-auto space-y-3 md:space-y-4">
-            <h1 className="text-2xl md:text-3xl lg:text-5xl font-bold tracking-tighter">
+        <div 
+          className="absolute inset-0 bg-cover bg-center -z-10" 
+          style={{ 
+            backgroundImage: "url('/lovable-uploads/5fac647b-cc7a-43c0-8a05-2907bbbd454e.png')",
+            backgroundPosition: "center bottom",
+            backgroundSize: "cover"
+          }}
+        >
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
+        </div>
+        <div className="container px-4 py-16 md:py-32 flex flex-col items-center text-center">
+          <div className="w-full max-w-xl mx-auto space-y-3 md:space-y-4 relative z-10">
+            <h1 className="text-2xl md:text-3xl lg:text-5xl font-bold tracking-tighter text-white">
               {t("home.hero.title")} - <span className="text-kyrgyz-red">{t("home.hero.subtitle")}</span>
             </h1>
-            <p className="text-muted-foreground text-base md:text-lg lg:text-xl">
+            <p className="text-white/90 text-base md:text-lg lg:text-xl">
               {t("home.hero.description")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4">
-              <Button size={isMobile ? "default" : "lg"} asChild>
+              <Button size={isMobile ? "default" : "lg"} asChild className="bg-kyrgyz-red hover:bg-kyrgyz-red/90">
                 <Link to="/catalog">
                   {t("home.hero.catalogButton")}
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -69,7 +79,6 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-        <div className="absolute inset-0 -z-10 banner-gradient" />
       </section>
 
       {/* Services Section */}
