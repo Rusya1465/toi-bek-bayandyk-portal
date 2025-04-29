@@ -19,18 +19,20 @@ const AuthButton = ({ user, handleSignOut, closeMenu }: AuthButtonProps) => {
         handleSignOut();
         closeMenu();
       }}
-      className="w-full flex items-center justify-center h-12 px-4 py-2 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground touch-manipulation"
+      className="w-full flex items-center justify-center h-12 px-4 py-2 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation"
+      aria-label={t("nav.logout")}
     >
-      <LogOut className="mr-2 h-4 w-4" />
+      <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
       {t("nav.logout")}
     </button>
   ) : (
     <Link
       to="/auth"
       onClick={closeMenu}
-      className="w-full flex items-center justify-center h-12 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 touch-manipulation"
+      className="w-full flex items-center justify-center h-12 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors touch-manipulation"
+      aria-label={t("nav.login")}
     >
-      <User className="mr-2 h-4 w-4" />
+      <User className="mr-2 h-4 w-4" aria-hidden="true" />
       {t("nav.login")}
     </Link>
   );

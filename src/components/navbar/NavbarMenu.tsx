@@ -30,14 +30,12 @@ const NavbarMenu = ({
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        console.log("Outside click detected, closing menu");
         setIsMenuOpen(false);
       }
     };
 
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isMenuOpen) {
-        console.log("Escape key pressed, closing menu");
         setIsMenuOpen(false);
       }
     };
@@ -47,16 +45,12 @@ const NavbarMenu = ({
       document.addEventListener('mousedown', handleOutsideClick, { capture: true });
       document.addEventListener('touchstart', handleOutsideClick, { capture: true, passive: true });
       document.addEventListener('keydown', handleEscapeKey);
-      
-      // Log that listeners are added
-      console.log("Menu event listeners added");
     }
 
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick, { capture: true });
       document.removeEventListener('touchstart', handleOutsideClick, { capture: true });
       document.removeEventListener('keydown', handleEscapeKey);
-      console.log("Menu event listeners removed");
     };
   }, [isMenuOpen, setIsMenuOpen]);
 
@@ -68,8 +62,10 @@ const NavbarMenu = ({
       id="mobile-menu"
       ref={menuRef}
       className={cn(
-        "mobile-menu", 
-        isMenuOpen ? "mobile-menu-visible animate-fade-in" : "mobile-menu-hidden",
+        "mobile-menu fixed top-16 left-0 right-0 bottom-0 z-40 bg-background/95 backdrop-blur-md", 
+        isMenuOpen 
+          ? "opacity-100 translate-y-0 pointer-events-auto visible animate-in slide-in-from-top duration-300 ease-in-out" 
+          : "opacity-0 -translate-y-4 pointer-events-none invisible animate-out slide-out-to-top duration-200 ease-in-out",
         "md:hidden"
       )}
       aria-hidden={!isMenuOpen}

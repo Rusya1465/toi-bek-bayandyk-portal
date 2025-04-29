@@ -33,7 +33,7 @@ const MenuContent = ({
   return (
     <div className="container py-6 space-y-6 overflow-y-auto h-full pb-safe">
       <h2 id="mobile-menu-heading" className="sr-only">{t("nav.mobileMenu")}</h2>
-      <nav className="space-y-4">
+      <nav className="space-y-4" role="menu" aria-labelledby="mobile-menu-heading">
         <MainLinks isActive={isActive} closeMenu={closeMenu} />
         
         {user && (
@@ -49,7 +49,7 @@ const MenuContent = ({
         )}
       </nav>
       
-      <div className="h-px bg-border"></div>
+      <div className="h-px bg-border" aria-hidden="true"></div>
       
       <AuthButton 
         user={user} 

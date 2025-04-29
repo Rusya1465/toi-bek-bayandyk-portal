@@ -17,6 +17,8 @@ const NavLink = ({ to, isActive, onClick, children }: NavLinkProps) => (
       isActive ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted/50"
     )}
     onClick={onClick}
+    aria-current={isActive ? "page" : undefined}
+    role="menuitem"
   >
     {children}
   </Link>
