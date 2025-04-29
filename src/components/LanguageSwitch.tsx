@@ -12,30 +12,21 @@ export const LanguageSwitch = () => {
     setLanguage(language === "ky" ? "ru" : "ky");
   };
 
+  // Simple switch between languages with appropriate sizing for mobile/desktop
   return (
     <Button
       variant="outline"
-      size={isMobile ? "sm" : "sm"}
-      className={`font-medium flex items-center ${isMobile ? 'px-2' : 'gap-1'}`}
+      size={isMobile ? "icon" : "sm"}
+      className="font-medium flex items-center"
       onClick={toggleLanguage}
     >
-      <Globe className={`h-4 w-4 ${isMobile ? '' : 'mr-1'}`} />
-      {!isMobile ? (
-        language === "ky" ? (
-          <>
-            <span className="mr-1">🇰🇬</span> КЫР
-          </>
-        ) : (
-          <>
-            <span className="mr-1">🇷🇺</span> РУС
-          </>
-        )
+      {isMobile ? (
+        <Globe className="h-4 w-4" />
       ) : (
-        language === "ky" ? (
-          <span className="ml-1">🇰🇬</span>
-        ) : (
-          <span className="ml-1">🇷🇺</span>
-        )
+        <>
+          <Globe className="h-4 w-4 mr-1" />
+          {language === "ky" ? "🇰🇬 КЫР" : "🇷🇺 РУС"}
+        </>
       )}
     </Button>
   );

@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
@@ -24,7 +23,7 @@ const NavbarMenu = ({
   const { t } = useTranslation();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Event handlers for closing menu on click outside
+  // We're keeping the event handlers but they won't be used anymore
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
       // Check if menu is open and click was outside menu
@@ -71,12 +70,10 @@ const NavbarMenu = ({
       className={cn(
         "fixed top-16 left-0 right-0 bottom-0 z-40 bg-background/95 backdrop-blur", 
         "transition-all duration-200 ease-in-out",
-        "md:hidden",
-        isMenuOpen 
-          ? "opacity-100 pointer-events-auto" 
-          : "opacity-0 pointer-events-none"
+        "hidden", // Always hide the menu now
+        "opacity-0 pointer-events-none" // Always disabled
       )}
-      aria-hidden={!isMenuOpen}
+      aria-hidden="true"
     >
       <MenuContent
         user={user}

@@ -1,45 +1,24 @@
-
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { useTranslation } from "@/contexts/LanguageContext";
-import { useIsMobile } from "@/hooks/use-mobile";
 import UserDropdown from "@/components/navbar/UserDropdown";
 import DesktopNav from "@/components/navbar/DesktopNav";
-import NavbarMenu from "@/components/navbar/NavbarMenu";
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, profile, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   const { t } = useTranslation();
-  const isMobile = useIsMobile();
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
   
-  // Close menu when route changes
+  // Close menu when route changes - keeping this in case we need similar logic in the future
   useEffect(() => {
-    setIsMenuOpen(false);
+    // No longer need to close menu on route change, but keeping this hook for potential future use
   }, [location.pathname]);
-
-  // Block scroll when menu is open
-  useEffect(() => {
-    if (isMenuOpen) {
-      document.body.classList.add('mobile-menu-open');
-    } else {
-      document.body.classList.remove('mobile-menu-open');
-    }
-    
-    // Cleanup on unmount
-    return () => {
-      document.body.classList.remove('mobile-menu-open');
-    };
-  }, [isMenuOpen]);
 
   const handleSignOut = async () => {
     try {
@@ -63,24 +42,19 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  // Simple toggle function
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <Link to="/" className="flex items-center" onClick={() => setIsMenuOpen(false)}>
+          <Link to="/" className="flex items-center">
             <span className="inline-block font-bold text-xl text-kyrgyz-red">
               ToiBek
             </span>
           </Link>
         </div>
         
-        {/* Desktop nav */}
+        {/* Nav links - now visible on all devices */}
         <DesktopNav isActive={isActive} isAdmin={isAdmin} />
         
         {/* Right navigation (languages, profile) */}
@@ -108,36 +82,8 @@ const Navbar = () => {
               {t("nav.login")}
             </Button>
           )}
-
-          {/* Mobile menu button - simplified */}
-          <Button
-            ref={menuButtonRef}
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={toggleMenu}
-            aria-label={isMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
-            aria-expanded={isMenuOpen}
-            type="button"
-          >
-            {isMenuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </Button>
         </div>
       </div>
-
-      {/* Mobile menu */}
-      <NavbarMenu 
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        isAdmin={isAdmin}
-        isPartner={isPartner}
-        handleSignOut={handleSignOut}
-        user={user}
-      />
     </header>
   );
 };
