@@ -7,6 +7,8 @@ import ProfileLinks from "./ProfileLinks";
 import PartnerLinks from "./PartnerLinks";
 import AdminLink from "./AdminLink";
 import AuthButton from "./AuthButton";
+import NavLink from "./NavLink";
+import { ShoppingBag } from "lucide-react";
 
 interface MenuContentProps {
   user: any;
@@ -35,6 +37,12 @@ const MenuContent = ({
       <h2 id="mobile-menu-heading" className="sr-only">{t("nav.mobileMenu")}</h2>
       <nav className="space-y-4" role="menu" aria-labelledby="mobile-menu-heading">
         <MainLinks isActive={isActive} closeMenu={closeMenu} />
+        
+        {/* Добавляем кнопку каталога в мобильном меню */}
+        <NavLink href="/catalog" active={isActive("/catalog")} onClick={closeMenu}>
+          <ShoppingBag className="mr-3 h-5 w-5" />
+          {t("nav.catalog")}
+        </NavLink>
         
         {user && (
           <ProfileLinks isActive={isActive} closeMenu={closeMenu} />
