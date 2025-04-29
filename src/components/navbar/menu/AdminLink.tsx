@@ -15,7 +15,7 @@ const AdminLink = ({ isActive, closeMenu }: AdminLinkProps) => {
   return (
     <>
       <div className="h-px bg-border my-4"></div>
-      <NavLink to="/admin" isActive={isActive("/admin")} onClick={closeMenu}>
+      <NavLink href="/admin" active={isActive("/admin")} onClick={closeMenu}>
         <Settings className="mr-3 h-5 w-5" />
         {t("nav.admin")}
       </NavLink>

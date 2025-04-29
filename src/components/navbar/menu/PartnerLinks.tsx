@@ -21,11 +21,11 @@ const PartnerLinks = ({ isActive, closeMenu }: PartnerLinksProps) => {
         {t("nav.services")}
       </p>
       
-      <NavLink to="/create-event" isActive={isActive("/create-event")} onClick={closeMenu}>
+      <NavLink href="/create-event" active={isActive("/create-event")} onClick={closeMenu}>
         <Plus className="mr-3 h-5 w-5" />
         {t("nav.createEvent")}
       </NavLink>
-      <NavLink to="/profile/services" isActive={isActive("/profile/services")} onClick={closeMenu}>
+      <NavLink href="/profile/services" active={isActive("/profile/services")} onClick={closeMenu}>
         <ShoppingBag className="mr-3 h-5 w-5" />
         {t("nav.services")}
       </NavLink>

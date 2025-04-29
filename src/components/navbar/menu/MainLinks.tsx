@@ -13,10 +13,10 @@ const MainLinks = ({ isActive, closeMenu }: MainLinksProps) => {
 
   return (
     <>
-      <NavLink to="/" isActive={isActive("/")} onClick={closeMenu}>
+      <NavLink href="/" active={isActive("/")} onClick={closeMenu}>
         {t("nav.home")}
       </NavLink>
-      <NavLink to="/catalog" isActive={isActive("/catalog")} onClick={closeMenu}>
+      <NavLink href="/catalog" active={isActive("/catalog")} onClick={closeMenu}>
         {t("nav.catalog")}
       </NavLink>
     </>

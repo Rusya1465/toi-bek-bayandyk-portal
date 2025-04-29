@@ -21,15 +21,15 @@ const ProfileLinks = ({ isActive, closeMenu }: ProfileLinksProps) => {
         {t("nav.profile")}
       </p>
       
-      <NavLink to="/profile" isActive={isActive("/profile")} onClick={closeMenu}>
+      <NavLink href="/profile" active={isActive("/profile")} onClick={closeMenu}>
         <User className="mr-3 h-5 w-5" />
         {t("nav.profile")}
       </NavLink>
-      <NavLink to="/profile/favorites" isActive={isActive("/profile/favorites")} onClick={closeMenu}>
+      <NavLink href="/profile/favorites" active={isActive("/profile/favorites")} onClick={closeMenu}>
         <Heart className="mr-3 h-5 w-5" />
         {t("nav.favorites")}
       </NavLink>
-      <NavLink to="/profile/history" isActive={isActive("/profile/history")} onClick={closeMenu}>
+      <NavLink href="/profile/history" active={isActive("/profile/history")} onClick={closeMenu}>
         <History className="mr-3 h-5 w-5" />
         {t("nav.history")}
       </NavLink>
