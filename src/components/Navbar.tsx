@@ -21,8 +21,8 @@ const Navbar = () => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Close menu when route changes
+  
+  // Улучшенная обработка изменения маршрута
   useEffect(() => {
     if (isMenuOpen) {
       setIsMenuOpen(false);
@@ -30,17 +30,19 @@ const Navbar = () => {
     }
   }, [location.pathname]);
 
-  // Handle body scroll locking with improved implementation
+  // Улучшенная блокировка скролла с проверкой на наличие класса
   useEffect(() => {
     if (isMenuOpen) {
-      document.body.classList.add('mobile-menu-open');
-      console.log("Menu opened, body scroll locked", document.body.classList);
+      if (!document.body.classList.contains('mobile-menu-open')) {
+        document.body.classList.add('mobile-menu-open');
+        console.log("Menu opened, body scroll locked", document.body.classList);
+      }
     } else {
       document.body.classList.remove('mobile-menu-open');
       console.log("Menu closed, body scroll unlocked", document.body.classList);
     }
     
-    // Always clean up on unmount
+    // Всегда очищаем при размонтировании
     return () => {
       document.body.classList.remove('mobile-menu-open');
       console.log("Cleanup: body scroll restored");
@@ -69,20 +71,28 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  // Improved toggle function with better event handling
+  // Полностью переработанная функция переключения меню
   const toggleMenu = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
     if (e) {
-      // Prevent default and stop propagation to ensure the event doesn't bubble
+      // Предотвращаем всплытие события
       e.preventDefault();
       e.stopPropagation();
     }
     
+    // Используем функциональное обновление с логированием
     setIsMenuOpen(prevState => {
       const newState = !prevState;
       console.log("Menu toggled, new state:", newState, "Event type:", e?.type);
       return newState;
     });
   }, []);
+
+  // Обработчик клика по бургеру с минимальной логикой для максимальной надежности
+  const handleMenuClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleMenu(e);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -125,33 +135,32 @@ const Navbar = () => {
             </Button>
           )}
 
-          {/* Кнопка мобильного меню - improved with ref and additional classes */}
+          {/* Кнопка мобильного меню - упрощена для максимальной надежности */}
           <Button
             ref={menuButtonRef}
             variant="ghost"
             size="icon"
-            className="md:hidden menu-toggle-button touch-manipulation"
-            onClick={toggleMenu}
-            onTouchEnd={(e) => {
-              // Handle touch events separately for mobile
-              e.preventDefault();
-              toggleMenu(e);
-            }}
+            className="md:hidden focus-visible:ring-2 focus-visible:ring-primary"
+            onClick={handleMenuClick}
             aria-label={isMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
             aria-expanded={isMenuOpen}
             aria-haspopup="true"
             aria-controls="mobile-menu"
+            data-state={isMenuOpen ? "open" : "closed"}
           >
             {isMenuOpen ? (
               <X className="h-5 w-5" aria-hidden="true" />
             ) : (
               <Menu className="h-5 w-5" aria-hidden="true" />
             )}
+            <span className="sr-only">
+              {isMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
+            </span>
           </Button>
         </div>
       </div>
 
-      {/* Мобильное меню - always rendered with conditional CSS classes */}
+      {/* Мобильное меню */}
       <NavbarMenu 
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
@@ -161,19 +170,6 @@ const Navbar = () => {
         handleSignOut={handleSignOut}
         user={user}
       />
-      
-      {/* Backdrop for closing the menu when clicking outside - improved with touchend */}
-      {isMenuOpen && (
-        <div 
-          className="mobile-menu-backdrop md:hidden" 
-          onClick={toggleMenu}
-          onTouchEnd={(e) => {
-            e.preventDefault();
-            toggleMenu(e);
-          }}
-          aria-hidden="true"
-        />
-      )}
     </header>
   );
 };

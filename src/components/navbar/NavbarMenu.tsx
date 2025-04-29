@@ -26,37 +26,46 @@ const NavbarMenu = ({
   const { t } = useTranslation();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Handle touch events and close menu when clicking outside
+  // Улучшенная обработка событий и закрытие меню при клике вне
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
+      // Проверяем, что меню открыто и клик был вне меню
+      if (isMenuOpen && menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        // Используем setTimeout для предотвращения конфликта с другими обработчиками событий
+        setTimeout(() => {
+          setIsMenuOpen(false);
+          console.log("Menu closed by outside click");
+        }, 0);
       }
     };
 
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isMenuOpen) {
         setIsMenuOpen(false);
+        console.log("Menu closed by Escape key");
       }
     };
 
+    // Используем passive: true для улучшения производительности на тачскринах
     if (isMenuOpen) {
-      // Use capture phase to ensure we get the event first
-      document.addEventListener('mousedown', handleOutsideClick, { capture: true });
-      document.addEventListener('touchstart', handleOutsideClick, { capture: true, passive: true });
+      document.addEventListener('mousedown', handleOutsideClick, { passive: true });
+      document.addEventListener('touchstart', handleOutsideClick, { passive: true });
       document.addEventListener('keydown', handleEscapeKey);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleOutsideClick, { capture: true });
-      document.removeEventListener('touchstart', handleOutsideClick, { capture: true });
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
       document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [isMenuOpen, setIsMenuOpen]);
 
-  const closeMenu = () => setIsMenuOpen(false);
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    console.log("Menu closed by closeMenu function");
+  };
 
-  // We always render the menu but control visibility with CSS
+  // Более надежное отображение меню с улучшенными анимациями
   return (
     <div 
       id="mobile-menu"
