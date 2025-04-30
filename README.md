@@ -1,73 +1,58 @@
-# Welcome to your Lovable project
 
-## Project info
+# ToiBek - Майрам уюштуруу кызматы
 
-**URL**: https://lovable.dev/projects/c0870eea-5bfd-4f3b-b7e9-ca369de82c18
+## Описание проекта
 
-## How can I edit this code?
+ToiBek - онлайн платформа для организации праздников и мероприятий на кыргызском языке. Сервис помогает найти места для проведения мероприятий, артистов и прокат оборудования для праздников.
 
-There are several ways of editing your application.
+## Технологии
 
-**Use Lovable**
+Проект разработан с использованием современного стека технологий:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c0870eea-5bfd-4f3b-b7e9-ca369de82c18) and start prompting.
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui компоненты
+- React Router для навигации
+- Tanstack Query для управления состоянием
+- Supabase для бэкенда и аутентификации
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Запуск проекта
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Клонирование репозитория
+git clone <URL_РЕПОЗИТОРИЯ>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Переход в директорию проекта
+cd toibek
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Установка зависимостей
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Запуск проекта в режиме разработки
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Деплой
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Проект размещен на Vercel: https://toibek.vercel.app/
 
-**Use GitHub Codespaces**
+## Структура проекта
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- `/src` - исходный код приложения
+  - `/components` - React компоненты
+  - `/pages` - страницы приложения
+  - `/contexts` - React контексты
+  - `/hooks` - кастомные React хуки
+  - `/lib` - вспомогательные функции
+  - `/i18n` - файлы локализации
+  - `/integrations` - интеграции с внешними сервисами
 
-## What technologies are used for this project?
+## Функциональность
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/c0870eea-5bfd-4f3b-b7e9-ca369de82c18) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- Каталог мест проведения мероприятий
+- Каталог артистов
+- Каталог оборудования для проката
+- Личный кабинет пользователя
+- Административная панель
+- Многоязычный интерфейс (кыргызский и русский)
