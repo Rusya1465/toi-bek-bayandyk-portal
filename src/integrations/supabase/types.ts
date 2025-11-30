@@ -14,7 +14,270 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      artists: {
+        Row: {
+          contacts: string | null
+          contacts_kg: string | null
+          contacts_ru: string | null
+          created_at: string
+          description: string | null
+          description_kg: string | null
+          description_ru: string | null
+          experience: string | null
+          experience_kg: string | null
+          experience_ru: string | null
+          genre: string | null
+          genre_kg: string | null
+          genre_ru: string | null
+          id: string
+          image_url: string | null
+          name: string
+          name_kg: string | null
+          name_ru: string | null
+          owner_id: string
+          price: string | null
+          price_kg: string | null
+          price_ru: string | null
+          rating: number | null
+          updated_at: string
+        }
+        Insert: {
+          contacts?: string | null
+          contacts_kg?: string | null
+          contacts_ru?: string | null
+          created_at?: string
+          description?: string | null
+          description_kg?: string | null
+          description_ru?: string | null
+          experience?: string | null
+          experience_kg?: string | null
+          experience_ru?: string | null
+          genre?: string | null
+          genre_kg?: string | null
+          genre_ru?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          name_kg?: string | null
+          name_ru?: string | null
+          owner_id: string
+          price?: string | null
+          price_kg?: string | null
+          price_ru?: string | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Update: {
+          contacts?: string | null
+          contacts_kg?: string | null
+          contacts_ru?: string | null
+          created_at?: string
+          description?: string | null
+          description_kg?: string | null
+          description_ru?: string | null
+          experience?: string | null
+          experience_kg?: string | null
+          experience_ru?: string | null
+          genre?: string | null
+          genre_kg?: string | null
+          genre_ru?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          name_kg?: string | null
+          name_ru?: string | null
+          owner_id?: string
+          price?: string | null
+          price_kg?: string | null
+          price_ru?: string | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      places: {
+        Row: {
+          address: string | null
+          address_kg: string | null
+          address_ru: string | null
+          capacity: string | null
+          capacity_kg: string | null
+          capacity_ru: string | null
+          contacts: string | null
+          contacts_kg: string | null
+          contacts_ru: string | null
+          created_at: string
+          description: string | null
+          description_kg: string | null
+          description_ru: string | null
+          id: string
+          image_url: string | null
+          name: string
+          name_kg: string | null
+          name_ru: string | null
+          owner_id: string
+          price: string | null
+          price_kg: string | null
+          price_ru: string | null
+          rating: number | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          address_kg?: string | null
+          address_ru?: string | null
+          capacity?: string | null
+          capacity_kg?: string | null
+          capacity_ru?: string | null
+          contacts?: string | null
+          contacts_kg?: string | null
+          contacts_ru?: string | null
+          created_at?: string
+          description?: string | null
+          description_kg?: string | null
+          description_ru?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          name_kg?: string | null
+          name_ru?: string | null
+          owner_id: string
+          price?: string | null
+          price_kg?: string | null
+          price_ru?: string | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          address_kg?: string | null
+          address_ru?: string | null
+          capacity?: string | null
+          capacity_kg?: string | null
+          capacity_ru?: string | null
+          contacts?: string | null
+          contacts_kg?: string | null
+          contacts_ru?: string | null
+          created_at?: string
+          description?: string | null
+          description_kg?: string | null
+          description_ru?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          name_kg?: string | null
+          name_ru?: string | null
+          owner_id?: string
+          price?: string | null
+          price_kg?: string | null
+          price_ru?: string | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rentals: {
+        Row: {
+          contacts: string | null
+          contacts_kg: string | null
+          contacts_ru: string | null
+          created_at: string
+          description: string | null
+          description_kg: string | null
+          description_ru: string | null
+          id: string
+          image_url: string | null
+          name: string
+          name_kg: string | null
+          name_ru: string | null
+          owner_id: string
+          price: string | null
+          price_kg: string | null
+          price_ru: string | null
+          rating: number | null
+          specs: string | null
+          specs_kg: string | null
+          specs_ru: string | null
+          updated_at: string
+        }
+        Insert: {
+          contacts?: string | null
+          contacts_kg?: string | null
+          contacts_ru?: string | null
+          created_at?: string
+          description?: string | null
+          description_kg?: string | null
+          description_ru?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          name_kg?: string | null
+          name_ru?: string | null
+          owner_id: string
+          price?: string | null
+          price_kg?: string | null
+          price_ru?: string | null
+          rating?: number | null
+          specs?: string | null
+          specs_kg?: string | null
+          specs_ru?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contacts?: string | null
+          contacts_kg?: string | null
+          contacts_ru?: string | null
+          created_at?: string
+          description?: string | null
+          description_kg?: string | null
+          description_ru?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          name_kg?: string | null
+          name_ru?: string | null
+          owner_id?: string
+          price?: string | null
+          price_kg?: string | null
+          price_ru?: string | null
+          rating?: number | null
+          specs?: string | null
+          specs_kg?: string | null
+          specs_ru?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
