@@ -117,11 +117,11 @@ export const UsersTab = () => {
   // Update user role mutation
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      // Use type assertion to define the parameter types
-      const { data, error } = await supabase.rpc('change_user_role', {
+      // Use type assertion since database functions aren't in the generated types
+      const { data, error } = await (supabase as any).rpc('change_user_role', {
         user_id: userId,
         new_role: role
-      } as ChangeUserRoleParams);
+      });
       
       if (error) throw error;
       return data;

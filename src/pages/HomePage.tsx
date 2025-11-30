@@ -1,14 +1,40 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 const HomePage = () => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+
+  // DIAGNOSTIC: Test Supabase connection
+  const { data: artists, error, isLoading } = useQuery({
+    queryKey: ['diagnostic-artists'],
+    queryFn: async () => {
+      console.log('🔍 DIAGNOSTIC: Attempting to fetch artists from Supabase...');
+      const { data, error } = await supabase
+        .from('artists')
+        .select('*')
+        .limit(3);
+      
+      console.log('🔍 DIAGNOSTIC: Supabase response:', { data, error });
+      
+      if (error) {
+        console.error('❌ DIAGNOSTIC: Supabase error:', error);
+        throw error;
+      }
+      return data || [];
+    },
+  });
+
+  useEffect(() => {
+    console.log('🔍 DIAGNOSTIC: Query state:', { isLoading, error, artistsCount: artists?.length });
+  }, [isLoading, error, artists]);
   
   const services = [
     {
@@ -49,6 +75,36 @@ const HomePage = () => {
 
   return (
     <div className="animate-fade-in">
+      {/* DIAGNOSTIC: Supabase Connection Test */}
+      <div className="fixed top-16 right-4 z-50 max-w-md">
+        {isLoading && (
+          <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded shadow-lg">
+            <p className="font-bold">🔄 Testing Supabase Connection...</p>
+          </div>
+        )}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg">
+            <p className="font-bold">❌ Supabase Connection Error:</p>
+            <p className="text-sm mt-1">{error.message}</p>
+            <p className="text-xs mt-1">Check console for details</p>
+          </div>
+        )}
+        {!isLoading && !error && artists && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg">
+            <p className="font-bold">✅ Connected to Supabase!</p>
+            <p className="text-sm mt-1">Found {artists.length} artists</p>
+            {artists.length === 0 && (
+              <p className="text-xs mt-1">Database is empty but connection works</p>
+            )}
+            {artists.length > 0 && (
+              <div className="text-xs mt-2">
+                <p>Sample: {artists[0]?.name || 'No name field'}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Hero Banner with Kyrgyz Themed Gradient Background */}
       <section className="relative overflow-hidden kyrgyz-pattern h-[60vh] md:h-[70vh]">
         <div 
