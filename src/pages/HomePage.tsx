@@ -16,25 +16,23 @@ const HomePage = () => {
   const { data: artists, error, isLoading } = useQuery({
     queryKey: ['diagnostic-artists'],
     queryFn: async () => {
-      console.log('🔍 DIAGNOSTIC: Attempting to fetch artists from Supabase...');
-      const { data, error } = await supabase
-        .from('artists')
-        .select('*')
-        .limit(3);
-      
-      console.log('🔍 DIAGNOSTIC: Supabase response:', { data, error });
-      
-      if (error) {
-        console.error('❌ DIAGNOSTIC: Supabase error:', error);
-        throw error;
+      console.log('🔍 DIAGNOSTIC: Fetching artists...');
+      try {
+        const { data, error } = await supabase
+          .from('artists')
+          .select('*')
+          .limit(3);
+        
+        console.log('🔍 DIAGNOSTIC: Response:', { data, error });
+        
+        if (error) throw error;
+        return data || [];
+      } catch (err) {
+        console.error('❌ DIAGNOSTIC: Error:', err);
+        throw err;
       }
-      return data || [];
     },
   });
-
-  useEffect(() => {
-    console.log('🔍 DIAGNOSTIC: Query state:', { isLoading, error, artistsCount: artists?.length });
-  }, [isLoading, error, artists]);
   
   const services = [
     {

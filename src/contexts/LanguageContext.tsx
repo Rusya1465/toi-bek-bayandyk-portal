@@ -22,8 +22,14 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<"ky" | "ru">(() => {
-    const savedLanguage = localStorage.getItem("language");
-    return (savedLanguage === "ky" || savedLanguage === "ru") ? savedLanguage : defaultLanguage;
+    try {
+      const savedLanguage = localStorage.getItem("language");
+      console.log('📖 LanguageProvider: Loaded language from localStorage:', savedLanguage);
+      return (savedLanguage === "ky" || savedLanguage === "ru") ? savedLanguage : defaultLanguage;
+    } catch (error) {
+      console.error('📖 LanguageProvider: Error accessing localStorage:', error);
+      return defaultLanguage;
+    }
   });
 
   useEffect(() => {
