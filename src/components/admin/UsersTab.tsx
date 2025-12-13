@@ -114,16 +114,23 @@ export const UsersTab = () => {
     },
   });
 
-  // Update user role mutation
+  // Update user role mutation using secure database function
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      // Use type assertion since database functions aren't in the generated types
-      const { data, error } = await (supabase as any).rpc('change_user_role', {
-        user_id: userId,
-        new_role: role
-      });
+      console.log('🔐 Attempting role change:', { userId, role });
       
-      if (error) throw error;
+      // Use the secure change_user_role function (checks admin permission on DB level)
+      const { data, error } = await supabase.rpc('change_user_role', {
+        target_user_id: userId,
+        new_role: role
+      } as any);
+      
+      if (error) {
+        console.error('🔐 Role change failed:', error);
+        throw error;
+      }
+      
+      console.log('🔐 Role change successful');
       return data;
     },
     onSuccess: () => {
