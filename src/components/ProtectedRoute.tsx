@@ -1,7 +1,6 @@
-
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
 
@@ -22,19 +21,34 @@ const ProtectedRoute = ({
 
   useEffect(() => {
     if (!loading) {
+      // Log access attempts for security monitoring
+      console.log('🔒 ProtectedRoute check:', { 
+        user: !!user, 
+        userRole: profile?.role,
+        requiredRoles: roles,
+        path: location.pathname 
+      });
+
       if (!user) {
         toast({
-          description: "Сизге кирүү керек",
+          description: "Кирүү талап кылынат",
           variant: "destructive",
         });
       } else if (roles.length > 0 && profile && !roles.includes(profile.role)) {
+        // Log unauthorized access attempts
+        console.warn('⚠️ Unauthorized access attempt:', {
+          userId: user.id,
+          userRole: profile.role,
+          requiredRoles: roles,
+          path: location.pathname
+        });
         toast({
-          description: "Сизде жетиштүү укуктар жок",
+          description: "Жетиштүү укуктар жок",
           variant: "destructive",
         });
       }
     }
-  }, [loading, user, profile, roles, toast]);
+  }, [loading, user, profile, roles, toast, location.pathname]);
 
   // Still loading, show loading spinner
   if (loading) {
