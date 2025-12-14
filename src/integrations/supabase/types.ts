@@ -287,6 +287,18 @@ export type Database = {
         Args: { new_role: string; target_user_id: string }
         Returns: undefined
       }
+      get_all_users: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          phone: string
+          role: string
+        }[]
+      }
       get_user_role: { Args: { _user_id: string }; Returns: string }
       has_any_role: {
         Args: { _roles: string[]; _user_id: string }
