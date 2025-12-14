@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,18 +16,17 @@ import type { ResetFormValues } from "@/components/auth/ResetPasswordForm";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const AuthPage = () => {
-  // Form states
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   
   const { signIn, signUp, requestPasswordReset } = useAuth();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
   
-  // Prevent body scrolling on mobile
   useEffect(() => {
     if (isMobile) {
       document.body.classList.add('overflow-hidden');
@@ -38,10 +38,10 @@ const AuthPage = () => {
   }, [isMobile]);
 
   const getErrorMessage = (error: any): string => {
-    const message = error?.message || "Күтүлбөгөн ката кетти";
+    const message = error?.message || t("common.error");
     
     if (message.includes("Invalid login credentials")) {
-      return "Туура эмес электрондук почта же сырсөз";
+      return t("auth.invalidEmail");
     } else if (message.includes("Email not confirmed")) {
       return "Электрондук почтаңызды тастыктаңыз";
     } else if (message.includes("User already registered")) {
@@ -49,7 +49,7 @@ const AuthPage = () => {
     } else if (message.includes("Email rate limit exceeded")) {
       return "Өтө көп аракет кылдыңыз. Кийинчерээк кайра аракет кылыңыз";
     } else if (message.includes("Password should be")) {
-      return "Сырсөз эң аз дегенде 6 белги болушу керек";
+      return t("auth.minLength").replace("{{length}}", "6");
     }
     
     return message;
@@ -77,7 +77,7 @@ const AuthPage = () => {
     try {
       await signUp(values.email, values.password, values.fullName);
       toast({
-        description: "Каттоо ийгиликтүү болду. Эми кирсеңиз болот.",
+        description: t("forms.notifications.registerSuccess"),
       });
       setActiveTab("login");
     } catch (error) {
@@ -97,7 +97,7 @@ const AuthPage = () => {
     try {
       await requestPasswordReset(values.resetEmail);
       toast({
-        description: "Сырсөздү калыбына келтирүү үчүн электрондук почтаңызды текшериңиз",
+        description: t("auth.resetPasswordDescription"),
       });
       setIsResettingPassword(false);
     } catch (error) {
@@ -112,16 +112,13 @@ const AuthPage = () => {
   };
 
   const handleBack = () => {
-    // If we came from somewhere else in the app, go back there
     if (location.key !== "default") {
       navigate(-1);
     } else {
-      // Otherwise go to home
       navigate("/");
     }
   };
 
-  // Mobile header with back button
   const MobileHeader = () => (
     <div className="flex items-center justify-between pt-4 px-4 md:hidden">
       <Button 
@@ -148,15 +145,15 @@ const AuthPage = () => {
       <>
         {isMobile && <MobileHeader />}
         <AuthContainer 
-          title="Сырсөздү калыбына келтирүү"
-          description="Сырсөздү калыбына келтирүү шилтемеси электрондук почтаңызга жөнөтүлөт"
+          title={t("auth.resetPassword")}
+          description={t("auth.resetPasswordDescription")}
           footer={
             <Button 
               variant="link" 
               onClick={() => setIsResettingPassword(false)}
               disabled={loading}
             >
-              Кирүүгө кайтуу
+              {t("auth.backToLogin")}
             </Button>
           }
         >
@@ -174,17 +171,17 @@ const AuthPage = () => {
     <>
       {isMobile && <MobileHeader />}
       <AuthContainer
-        title={activeTab === "login" ? "Кирүү" : "Катталуу"}
+        title={activeTab === "login" ? t("auth.loginTitle") : t("auth.registerTitle")}
         description={
           activeTab === "login"
-            ? "Системага кирүү үчүн маалыматтарыңызды киргизиңиз"
-            : "Жаңы аккаунт түзүү үчүн маалыматтарыңызды киргизиңиз"
+            ? t("auth.loginDescription")
+            : t("auth.registerDescription")
         }
       >
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")}>
           <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="login">Кирүү</TabsTrigger>
-            <TabsTrigger value="register">Катталуу</TabsTrigger>
+            <TabsTrigger value="login">{t("auth.login")}</TabsTrigger>
+            <TabsTrigger value="register">{t("auth.register")}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="login">

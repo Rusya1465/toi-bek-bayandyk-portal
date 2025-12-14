@@ -1,10 +1,10 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   Form,
   FormControl,
@@ -14,14 +14,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-// Form validation schema
-const registerSchema = z.object({
-  fullName: z.string().min(2, "Толук атыңыз эң аз дегенде 2 белги болушу керек"),
-  email: z.string().email("Туура эмес электрондук почта"),
-  password: z.string().min(6, "Сырсөз эң аз дегенде 6 белги болушу керек"),
-});
-
-export type RegisterFormValues = z.infer<typeof registerSchema>;
+export type RegisterFormValues = {
+  fullName: string;
+  email: string;
+  password: string;
+};
 
 interface RegisterFormProps {
   onSubmit: (values: RegisterFormValues) => Promise<void>;
@@ -29,6 +26,14 @@ interface RegisterFormProps {
 }
 
 const RegisterForm = ({ onSubmit, loading }: RegisterFormProps) => {
+  const { t } = useTranslation();
+
+  const registerSchema = z.object({
+    fullName: z.string().min(2, t("auth.minLength").replace("{{length}}", "2")),
+    email: z.string().email(t("auth.invalidEmail")),
+    password: z.string().min(6, t("auth.minLength").replace("{{length}}", "6")),
+  });
+
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -46,7 +51,7 @@ const RegisterForm = ({ onSubmit, loading }: RegisterFormProps) => {
           name="fullName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Толук аты-жөнүңүз</FormLabel>
+              <FormLabel>{t("auth.fullName")}</FormLabel>
               <FormControl>
                 <Input
                   disabled={loading}
@@ -62,7 +67,7 @@ const RegisterForm = ({ onSubmit, loading }: RegisterFormProps) => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t("auth.email")}</FormLabel>
               <FormControl>
                 <Input
                   type="email"
@@ -79,7 +84,7 @@ const RegisterForm = ({ onSubmit, loading }: RegisterFormProps) => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Сырсөз</FormLabel>
+              <FormLabel>{t("auth.password")}</FormLabel>
               <FormControl>
                 <Input
                   type="password"
@@ -95,10 +100,10 @@ const RegisterForm = ({ onSubmit, loading }: RegisterFormProps) => {
           {loading ? (
             <>
               <Loader className="mr-2 h-4 w-4 animate-spin" />
-              Каттоодо...
+              {t("auth.registering")}
             </>
           ) : (
-            "Катталуу"
+            t("auth.register")
           )}
         </Button>
       </form>

@@ -218,5 +218,56 @@
     "address": "Бишкек, Кыргызстан",
     "socialMedia": "Социалдык тармактар",
     "allRightsReserved": "Бардык укуктар корголгон."
+  },
+  "profile": {
+    "title": "Жеке кабинет",
+    "myProfile": "Менин профилим",
+    "profileDescription": "Жеке маалыматтарыңыз жөнүндө негизги маалымат.",
+    "fullName": "Аты-жөнүңүз",
+    "email": "Электрондук почта",
+    "phone": "Телефон",
+    "role": "Роль",
+    "notSpecified": "Көрсөтүлгөн эмес",
+    "roles": {
+      "admin": "Администратор",
+      "partner": "Өнөктөш",
+      "user": "Колдонуучу"
+    },
+    "tabs": {
+      "profile": "Профиль",
+      "settings": "Жөндөөлөр",
+      "favorites": "Тандалмалар",
+      "history": "Тарых",
+      "services": "Кызматтарым"
+    },
+    "settingsTitle": "Профиль жөндөөлөрү",
+    "settingsDescription": "Профилиңизди жөндөө үчүн төмөндөгү форманы толтуруңуз.",
+    "favoritesTitle": "Тандалмалар",
+    "favoritesDescription": "Сиз сактаган бардык кызматтар жана жайлар.",
+    "historyTitle": "Тарых",
+    "historyDescription": "Сиз караган жана колдонгон кызматтардын тарыхы.",
+    "comingSoon": "Азырынча бул секция жеткиликтүү эмес."
+  },
+  "auth": {
+    "login": "Кирүү",
+    "register": "Катталуу",
+    "loginTitle": "Кирүү",
+    "registerTitle": "Катталуу",
+    "loginDescription": "Системага кирүү үчүн маалыматтарыңызды киргизиңиз",
+    "registerDescription": "Жаңы аккаунт түзүү үчүн маалыматтарыңызды киргизиңиз",
+    "email": "Email",
+    "password": "Сырсөз",
+    "fullName": "Толук аты-жөнүңүз",
+    "rememberMe": "Мени эстеп калуу",
+    "forgotPassword": "Сырсөздү унуттуңузбу?",
+    "loggingIn": "Кирүүдө...",
+    "registering": "Каттоодо...",
+    "resetPassword": "Сырсөздү калыбына келтирүү",
+    "resetPasswordDescription": "Сырсөздү калыбына келтирүү шилтемеси электрондук почтаңызга жөнөтүлөт",
+    "sendResetLink": "Шилтеме жөнөтүү",
+    "sending": "Жөнөтүлүүдө...",
+    "backToLogin": "Кирүүгө кайтуу",
+    "minLength": "Эң аз дегенде {{length}} белги болушу керек",
+    "invalidEmail": "Туура эмес электрондук почта"
   }
 }

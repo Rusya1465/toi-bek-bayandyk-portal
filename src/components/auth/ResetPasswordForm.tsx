@@ -1,10 +1,10 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   Form,
   FormControl,
@@ -14,12 +14,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-// Form validation schema
-const resetSchema = z.object({
-  resetEmail: z.string().email("Туура эмес электрондук почта"),
-});
-
-export type ResetFormValues = z.infer<typeof resetSchema>;
+export type ResetFormValues = {
+  resetEmail: string;
+};
 
 interface ResetPasswordFormProps {
   onSubmit: (values: ResetFormValues) => Promise<void>;
@@ -28,6 +25,12 @@ interface ResetPasswordFormProps {
 }
 
 const ResetPasswordForm = ({ onSubmit, onCancel, loading }: ResetPasswordFormProps) => {
+  const { t } = useTranslation();
+
+  const resetSchema = z.object({
+    resetEmail: z.string().email(t("auth.invalidEmail")),
+  });
+
   const form = useForm<ResetFormValues>({
     resolver: zodResolver(resetSchema),
     defaultValues: {
@@ -43,7 +46,7 @@ const ResetPasswordForm = ({ onSubmit, onCancel, loading }: ResetPasswordFormPro
           name="resetEmail"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t("auth.email")}</FormLabel>
               <FormControl>
                 <Input
                   type="email"
@@ -59,10 +62,10 @@ const ResetPasswordForm = ({ onSubmit, onCancel, loading }: ResetPasswordFormPro
           {loading ? (
             <>
               <Loader className="mr-2 h-4 w-4 animate-spin" />
-              Жөнөтүлүүдө...
+              {t("auth.sending")}
             </>
           ) : (
-            "Шилтеме жөнөтүү"
+            t("auth.sendResetLink")
           )}
         </Button>
       </form>

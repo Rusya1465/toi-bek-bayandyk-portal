@@ -1,13 +1,11 @@
-
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTranslation } from "@/contexts/LanguageContext";
 import {
   Form,
   FormControl,
@@ -17,14 +15,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-// Form validation schema
-const loginSchema = z.object({
-  email: z.string().email("Туура эмес электрондук почта"),
-  password: z.string().min(6, "Сырсөз эң аз дегенде 6 белги болушу керек"),
-  rememberMe: z.boolean().default(true),
-});
-
-export type LoginFormValues = z.infer<typeof loginSchema>;
+export type LoginFormValues = {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+};
 
 interface LoginFormProps {
   onSubmit: (values: LoginFormValues) => Promise<void>;
@@ -33,6 +28,14 @@ interface LoginFormProps {
 }
 
 const LoginForm = ({ onSubmit, onForgotPassword, loading }: LoginFormProps) => {
+  const { t } = useTranslation();
+
+  const loginSchema = z.object({
+    email: z.string().email(t("auth.invalidEmail")),
+    password: z.string().min(6, t("auth.minLength").replace("{{length}}", "6")),
+    rememberMe: z.boolean().default(true),
+  });
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -50,7 +53,7 @@ const LoginForm = ({ onSubmit, onForgotPassword, loading }: LoginFormProps) => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t("auth.email")}</FormLabel>
               <FormControl>
                 <Input
                   type="email"
@@ -67,7 +70,7 @@ const LoginForm = ({ onSubmit, onForgotPassword, loading }: LoginFormProps) => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Сырсөз</FormLabel>
+              <FormLabel>{t("auth.password")}</FormLabel>
               <FormControl>
                 <Input
                   type="password"
@@ -92,7 +95,7 @@ const LoginForm = ({ onSubmit, onForgotPassword, loading }: LoginFormProps) => {
                   />
                 </FormControl>
                 <FormLabel className="text-sm font-normal">
-                  Мени эстеп калуу
+                  {t("auth.rememberMe")}
                 </FormLabel>
               </FormItem>
             )}
@@ -105,17 +108,17 @@ const LoginForm = ({ onSubmit, onForgotPassword, loading }: LoginFormProps) => {
               onForgotPassword();
             }}
           >
-            Сырсөздү унуттуңузбу?
+            {t("auth.forgotPassword")}
           </Button>
         </div>
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? (
             <>
               <Loader className="mr-2 h-4 w-4 animate-spin" />
-              Кирүүдө...
+              {t("auth.loggingIn")}
             </>
           ) : (
-            "Кирүү"
+            t("auth.login")
           )}
         </Button>
       </form>
