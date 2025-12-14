@@ -1,8 +1,6 @@
-
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import ruTranslations from "../i18n/ru.json";
 import kyTranslations from "../i18n/ky.json";
-
 type LanguageContextType = {
   language: "ky" | "ru";
   setLanguage: (language: "ky" | "ru") => void;
