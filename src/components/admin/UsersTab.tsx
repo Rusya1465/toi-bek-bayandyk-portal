@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,210 +19,244 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Profile } from "@/lib/types/auth";
-import { Loader } from "lucide-react";
+import { Loader, RefreshCw } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface User {
   id: string;
   email: string;
   created_at: string;
-  profile?: Profile;
-}
-
-// Define interface for change_user_role function parameters
-interface ChangeUserRoleParams {
-  user_id: string;
-  new_role: string;
+  full_name: string | null;
+  phone: string | null;
+  role: string;
+  avatar_url: string | null;
 }
 
 export const UsersTab = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [selectedUser, setSelectedUser] = useState<{ id: string; name: string; newRole: string } | null>(null);
 
-  // Fetch all users with their profiles
-  const { data: users = [], isLoading } = useQuery({
-    queryKey: ['admin-users'],
+  // Fetch all users via RPC function
+  const { data: users = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['admin-all-users'],
     queryFn: async () => {
-      try {
-        // Get all profiles (Supabase auth.admin.listUsers is only available on Edge Functions)
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('*');
-
-        if (profilesError) {
-          toast({
-            variant: "destructive",
-            description: "Профилдерди алууда ката кетти: " + profilesError.message,
-          });
-          return [];
-        }
-
-        // Get all users that have profiles
-        const userIds = profiles.map(profile => profile.id);
-        
-        try {
-          // Try to use admin API first
-          const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
-          
-          if (!authError && authData) {
-            // If admin API worked, combine users with their profiles
-            return authData.users.map(user => {
-              const profile = profiles?.find(p => p.id === user.id);
-              return {
-                id: user.id,
-                email: user.email,
-                created_at: user.created_at,
-                profile,
-              };
-            });
-          }
-        } catch (adminError) {
-          console.log("Admin API not available:", adminError);
-        }
-        
-        // Fallback to regular user data if admin API fails
-        const { data: userData, error: userError } = await supabase.auth.getUser();
-        
-        if (userError) {
-          toast({
-            variant: "destructive",
-            description: "Колдонуучуларды алууда ката кетти",
-          });
-          return [];
-        }
-        
-        // Return just the current user with their profile
-        if (userData.user) {
-          const profile = profiles.find(p => p.id === userData.user.id);
-          return [{
-            id: userData.user.id,
-            email: userData.user.email,
-            created_at: userData.user.created_at,
-            profile
-          }];
-        }
-        return [];
-        
-      } catch (error: any) {
-        toast({
-          variant: "destructive",
-          description: "Колдонуучуларды жүктөөдө ката: " + error.message,
-        });
-        return [];
+      console.log('🔍 Fetching all users via get_all_users...');
+      
+      const { data, error } = await supabase.rpc('get_all_users' as any);
+      
+      if (error) {
+        console.error('❌ Error fetching users:', error);
+        throw error;
       }
+      
+      console.log('✅ Users fetched successfully:', data?.length || 0, data);
+      return (data as unknown as User[]) || [];
     },
+    retry: 1,
   });
 
-  // Update user role mutation using secure database function
-  const updateRoleMutation = useMutation({
+  // Mutation for changing role
+  const changeRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      console.log('🔐 Attempting role change:', { userId, role });
+      console.log('🔄 Changing role:', { userId, role });
       
-      // Use the secure change_user_role function (checks admin permission on DB level)
       const { data, error } = await supabase.rpc('change_user_role', {
         target_user_id: userId,
         new_role: role
       } as any);
       
       if (error) {
-        console.error('🔐 Role change failed:', error);
+        console.error('❌ Error changing role:', error);
         throw error;
       }
       
-      console.log('🔐 Role change successful');
+      console.log('✅ Role changed successfully:', data);
       return data;
     },
     onSuccess: () => {
       toast({
-        description: "Колдонуучунун ролу ийгиликтүү жаңыртылды",
+        description: "Колдонуучунун ролу ийгиликтүү өзгөртүлдү",
       });
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-all-users'] });
+      setSelectedUser(null);
     },
     onError: (error: any) => {
+      console.error('❌ Mutation error:', error);
       toast({
         variant: "destructive",
-        description: "Ролду жаңыртууда ката кетти: " + error.message,
+        description: "Ролду өзгөртүүдө ката кетти: " + (error.message || 'Unknown error'),
       });
+      setSelectedUser(null);
     }
   });
 
-  // Update user role
-  const handleRoleChange = (userId: string, role: string) => {
-    updateRoleMutation.mutate({ userId, role });
+  const handleRoleChangeRequest = (userId: string, userName: string, newRole: string) => {
+    setSelectedUser({ id: userId, name: userName, newRole });
   };
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Колдонуучулар</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="flex justify-center py-8">
-            <Loader className="h-8 w-8 animate-spin" />
+  const confirmRoleChange = () => {
+    if (selectedUser) {
+      changeRoleMutation.mutate({ 
+        userId: selectedUser.id, 
+        role: selectedUser.newRole 
+      });
+    }
+  };
+
+  const getRoleName = (role: string) => {
+    const roles: { [key: string]: string } = {
+      'admin': 'Администратор',
+      'partner': 'Өнөктөш',
+      'user': 'Колдонуучу'
+    };
+    return roles[role] || role;
+  };
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Колдонуучулар</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <p className="text-destructive mb-4">
+              Колдонуучуларды жүктөөдө ката кетти: {(error as any).message}
+            </p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Сиздин аккаунтуңуз админ укугуна ээ экенин текшериңиз
+            </p>
+            <Button onClick={() => refetch()} variant="outline">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Кайра аракет
+            </Button>
           </div>
-        ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Аты-жөнү</TableHead>
-                  <TableHead>Телефон</TableHead>
-                  <TableHead>Роль</TableHead>
-                  <TableHead>Кошулган күнү</TableHead>
-                  <TableHead>Аракеттер</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.length === 0 ? (
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Колдонуучулар</CardTitle>
+          <Button onClick={() => refetch()} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Жаңылоо
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader className="h-8 w-8 animate-spin" />
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-6">
-                      Колдонуучулар табылган жок
-                    </TableCell>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Аты-жөнү</TableHead>
+                    <TableHead>Телефон</TableHead>
+                    <TableHead>Роль</TableHead>
+                    <TableHead>Кошулган күнү</TableHead>
                   </TableRow>
-                ) : (
-                  users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.profile?.full_name || '-'}</TableCell>
-                      <TableCell>{user.profile?.phone || '-'}</TableCell>
-                      <TableCell>
-                        <Select
-                          value={user.profile?.role || 'user'}
-                          onValueChange={(value) => handleRoleChange(user.id, value)}
-                          disabled={updateRoleMutation.isPending}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="user">Колдонуучу</SelectItem>
-                            <SelectItem value="partner">Өнөктөш</SelectItem>
-                            <SelectItem value="admin">Админ</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(user.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          disabled={true}
-                        >
-                          Өчүрүү
-                        </Button>
+                </TableHeader>
+                <TableBody>
+                  {users.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-6">
+                        Колдонуучулар табылган жок
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                  ) : (
+                    users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">{user.email}</TableCell>
+                        <TableCell>{user.full_name || '-'}</TableCell>
+                        <TableCell>{user.phone || '-'}</TableCell>
+                        <TableCell>
+                          <Select
+                            value={user.role || 'user'}
+                            onValueChange={(value) => 
+                              handleRoleChangeRequest(user.id, user.full_name || user.email, value)
+                            }
+                            disabled={changeRoleMutation.isPending}
+                          >
+                            <SelectTrigger className="w-40">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="user">Колдонуучу</SelectItem>
+                              <SelectItem value="partner">Өнөктөш</SelectItem>
+                              <SelectItem value="admin">Админ</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(user.created_at).toLocaleDateString('ru-RU')}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+          
+          {!isLoading && users.length > 0 && (
+            <div className="mt-4 text-sm text-muted-foreground">
+              Жалпы колдонуучулар: {users.length}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={!!selectedUser} onOpenChange={(open) => !open && setSelectedUser(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Ролду өзгөртүү</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUser && (
+                <>
+                  <strong>{selectedUser.name}</strong> колдонуучусунун ролун{' '}
+                  <strong>{getRoleName(selectedUser.newRole)}</strong> кылып өзгөртүүнү каалайсызбы?
+                  <br /><br />
+                  Бул аракет дароо аткарылат жана колдонуучунун укуктарын өзгөртөт.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Жокко чыгаруу</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmRoleChange}
+              disabled={changeRoleMutation.isPending}
+            >
+              {changeRoleMutation.isPending ? (
+                <>
+                  <Loader className="h-4 w-4 animate-spin mr-2" />
+                  Өзгөртүлүүдө...
+                </>
+              ) : (
+                'Ооба, өзгөртүү'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
