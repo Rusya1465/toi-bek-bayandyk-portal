@@ -218,5 +218,56 @@
     "address": "Бишкек, Кыргызстан",
     "socialMedia": "Социальные сети",
     "allRightsReserved": "Все права защищены."
+  },
+  "profile": {
+    "title": "Личный кабинет",
+    "myProfile": "Мой профиль",
+    "profileDescription": "Основная информация о ваших личных данных.",
+    "fullName": "Имя и фамилия",
+    "email": "Электронная почта",
+    "phone": "Телефон",
+    "role": "Роль",
+    "notSpecified": "Не указано",
+    "roles": {
+      "admin": "Администратор",
+      "partner": "Партнер",
+      "user": "Пользователь"
+    },
+    "tabs": {
+      "profile": "Профиль",
+      "settings": "Настройки",
+      "favorites": "Избранное",
+      "history": "История",
+      "services": "Мои услуги"
+    },
+    "settingsTitle": "Настройки профиля",
+    "settingsDescription": "Заполните форму ниже для настройки вашего профиля.",
+    "favoritesTitle": "Избранное",
+    "favoritesDescription": "Все сохраненные вами услуги и заведения.",
+    "historyTitle": "История",
+    "historyDescription": "История просмотренных и использованных услуг.",
+    "comingSoon": "Этот раздел пока недоступен."
+  },
+  "auth": {
+    "login": "Войти",
+    "register": "Регистрация",
+    "loginTitle": "Вход",
+    "registerTitle": "Регистрация",
+    "loginDescription": "Введите ваши данные для входа в систему",
+    "registerDescription": "Введите ваши данные для создания нового аккаунта",
+    "email": "Email",
+    "password": "Пароль",
+    "fullName": "Полное имя",
+    "rememberMe": "Запомнить меня",
+    "forgotPassword": "Забыли пароль?",
+    "loggingIn": "Вход...",
+    "registering": "Регистрация...",
+    "resetPassword": "Восстановление пароля",
+    "resetPasswordDescription": "Ссылка для восстановления пароля будет отправлена на вашу электронную почту",
+    "sendResetLink": "Отправить ссылку",
+    "sending": "Отправка...",
+    "backToLogin": "Вернуться ко входу",
+    "minLength": "Минимум {{length}} символов",
+    "invalidEmail": "Неверный формат email"
   }
 }
