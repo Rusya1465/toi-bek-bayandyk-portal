@@ -12,10 +12,7 @@ import { StepForm } from "@/components/StepForm";
 import { ImageStep } from "../step-forms/ImageStep";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { useFormDraft } from "@/hooks/useFormDraft";
-import { LanguageFormTabs } from "@/components/LanguageFormTabs";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { LanguageField } from "../step-forms/LanguageField";
 
 // Define schema with both languages
 const artistSchema = z.object({
@@ -43,7 +40,6 @@ interface ArtistFormProps {
   isEditing?: boolean;
 }
 
-// Define the storage key for drafts
 const DRAFT_STORAGE_KEY = "artist-form-draft";
 
 export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormProps) => {
@@ -53,7 +49,6 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
   const navigate = useNavigate();
   const { t, language } = useTranslation();
 
-  // Initialize form
   const form = useForm<ArtistFormData>({
     resolver: zodResolver(artistSchema),
     defaultValues: {
@@ -75,7 +70,6 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
     },
   });
 
-  // Use custom hooks
   const { 
     imageUrl, 
     imageFile, 
@@ -94,41 +88,27 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
     isEditing
   );
 
-  // Watch fields for validation
   const watchName = form.watch("name");
 
-  // Initialize imageUrl with initial data - FIX: Make sure this useEffect returns either nothing or a proper cleanup function
   useEffect(() => {
     if (initialData?.image_url) {
       initializeImage(initialData.image_url);
     }
-    // Return nothing or a proper cleanup function
-    return () => {
-      // Empty cleanup function
-    };
   }, [initialData]);
 
-  const handleFormSaveDraft = () => {
-    saveDraft(imageUrl);
-  };
-
-  const handleFormLoadDraft = () => {
-    loadDraft(setImageUrl);
-  };
+  const handleFormSaveDraft = () => saveDraft(imageUrl);
+  const handleFormLoadDraft = () => loadDraft(setImageUrl);
 
   const onSubmit = async () => {
     if (!user) return;
     
     setLoading(true);
     try {
-      // Get form data
       const data = form.getValues();
       
-      // Upload image if there's a new one
       let finalImageUrl = imageUrl;
       if (imageFile) {
         finalImageUrl = await uploadImage();
-        
         if (!finalImageUrl) {
           setLoading(false);
           return;
@@ -137,36 +117,24 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
 
       const artistData = {
         ...data,
-        name: data.name, // Ensure name is explicitly set and not optional
+        name: data.name,
         image_url: finalImageUrl,
         owner_id: user.id,
       };
 
       if (isEditing) {
-        // Update existing artist
         const { error } = await supabase
           .from("artists")
           .update(artistData)
           .eq("id", initialData.id);
-
         if (error) throw error;
-
-        toast({
-          description: t("services.messages.updateSuccess"),
-        });
+        toast({ description: t("services.messages.updateSuccess") });
       } else {
-        // Create new artist
         const { error } = await supabase
           .from("artists")
           .insert(artistData);
-
         if (error) throw error;
-
-        toast({
-          description: t("services.messages.createSuccess"),
-        });
-        
-        // Clear draft after successful submission
+        toast({ description: t("services.messages.createSuccess") });
         clearDraft();
       }
 
@@ -182,234 +150,13 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
     }
   };
 
-  // Determine which language is alternate based on current language
   const alternateLanguage = language === "ky" ? "ru" : "ky";
+  const altNameField = `name_${alternateLanguage}` as "name_ru" | "name_kg";
+  const altCategoryField = `category_${alternateLanguage}` as "category_ru" | "category_kg";
+  const altDescField = `description_${alternateLanguage}` as "description_ru" | "description_kg";
+  const altPriceField = `price_${alternateLanguage}` as "price_ru" | "price_kg";
+  const altContactsField = `contacts_${alternateLanguage}` as "contacts_ru" | "contacts_kg";
 
-  // Define custom components for language tabs
-  const NameInput = () => {
-    const altLang = alternateLanguage;
-    const altLangField = `name_${altLang}` as "name_ru" | "name_kg";
-    
-    return (
-      <LanguageFormTabs
-        mainContent={
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.nameArtist")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("services.fields.namePlaceholder")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateContent={
-          <FormField
-            control={form.control}
-            name={altLangField}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.nameArtist")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("services.fields.namePlaceholder")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateLanguage={altLang}
-        description={t("services.language.form.description")}
-      />
-    );
-  };
-
-  const CategoryInput = () => {
-    const altLang = alternateLanguage;
-    const altLangField = `category_${altLang}` as "category_ru" | "category_kg";
-    
-    return (
-      <LanguageFormTabs
-        mainContent={
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.category")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("services.fields.categoryArtist")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateContent={
-          <FormField
-            control={form.control}
-            name={altLangField}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.category")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("services.fields.categoryArtist")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateLanguage={altLang}
-      />
-    );
-  };
-
-  const DescriptionInputTab = () => {
-    const altLang = alternateLanguage;
-    const altLangField = `description_${altLang}` as "description_ru" | "description_kg";
-    
-    return (
-      <LanguageFormTabs
-        mainContent={
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.description")}</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder={t("services.fields.descriptionArtist")}
-                    className="min-h-[150px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateContent={
-          <FormField
-            control={form.control}
-            name={altLangField}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.description")}</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder={t("services.fields.descriptionArtist")}
-                    className="min-h-[150px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateLanguage={altLang}
-        description={t("services.language.form.description")}
-      />
-    );
-  };
-  
-  const PriceInput = () => {
-    const altLang = alternateLanguage;
-    const altLangField = `price_${altLang}` as "price_ru" | "price_kg";
-    
-    return (
-      <LanguageFormTabs
-        mainContent={
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.price")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("services.fields.priceArtistExample")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateContent={
-          <FormField
-            control={form.control}
-            name={altLangField}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.price")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("services.fields.priceArtistExample")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateLanguage={altLang}
-      />
-    );
-  };
-
-  const ContactsInput = () => {
-    const altLang = alternateLanguage;
-    const altLangField = `contacts_${altLang}` as "contacts_ru" | "contacts_kg";
-    
-    return (
-      <LanguageFormTabs
-        mainContent={
-          <FormField
-            control={form.control}
-            name="contacts"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.contacts")}</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder={t("services.fields.contactsPlaceholder")}
-                    className="min-h-[100px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateContent={
-          <FormField
-            control={form.control}
-            name={altLangField}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.contacts")}</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder={t("services.fields.contactsPlaceholder")}
-                    className="min-h-[100px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateLanguage={altLang}
-      />
-    );
-  };
-
-  // Define steps
   const steps = [
     {
       id: "basic-info",
@@ -417,15 +164,30 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
       isValid: !!watchName,
       component: (
         <div className="space-y-4">
-          <NameInput />
-          <CategoryInput />
+          <LanguageField
+            control={form.control}
+            mainName="name"
+            altName={altNameField}
+            label={t("services.fields.nameArtist")}
+            placeholder={t("services.fields.namePlaceholder")}
+            alternateLanguage={alternateLanguage}
+            description={t("services.language.form.description")}
+          />
+          <LanguageField
+            control={form.control}
+            mainName="category"
+            altName={altCategoryField}
+            label={t("services.fields.category")}
+            placeholder={t("services.fields.categoryArtist")}
+            alternateLanguage={alternateLanguage}
+          />
         </div>
       )
     },
     {
       id: "image",
       title: t("services.steps.images"),
-      isValid: true, // Image is optional
+      isValid: true,
       component: (
         <ImageStep
           imageUrl={imageUrl}
@@ -438,17 +200,44 @@ export const ArtistStepForm = ({ initialData, isEditing = false }: ArtistFormPro
     {
       id: "description",
       title: t("services.steps.description"),
-      isValid: true, // Description is optional
-      component: <DescriptionInputTab />
+      isValid: true,
+      component: (
+        <LanguageField
+          control={form.control}
+          mainName="description"
+          altName={altDescField}
+          label={t("services.fields.description")}
+          placeholder={t("services.fields.descriptionArtist")}
+          alternateLanguage={alternateLanguage}
+          description={t("services.language.form.description")}
+          type="textarea"
+        />
+      )
     },
     {
       id: "contacts",
       title: t("services.steps.contacts"),
-      isValid: true, // Contacts are optional
+      isValid: true,
       component: (
         <div className="space-y-4">
-          <PriceInput />
-          <ContactsInput />
+          <LanguageField
+            control={form.control}
+            mainName="price"
+            altName={altPriceField}
+            label={t("services.fields.price")}
+            placeholder={t("services.fields.priceArtistExample")}
+            alternateLanguage={alternateLanguage}
+          />
+          <LanguageField
+            control={form.control}
+            mainName="contacts"
+            altName={altContactsField}
+            label={t("services.fields.contacts")}
+            placeholder={t("services.fields.contactsPlaceholder")}
+            alternateLanguage={alternateLanguage}
+            type="textarea"
+            textareaClassName="min-h-[100px]"
+          />
         </div>
       )
     }

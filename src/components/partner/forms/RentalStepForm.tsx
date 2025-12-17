@@ -12,12 +12,8 @@ import { StepForm } from "@/components/StepForm";
 import { ImageStep } from "../step-forms/ImageStep";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { useFormDraft } from "@/hooks/useFormDraft";
-import { LanguageFormTabs } from "@/components/LanguageFormTabs";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { LanguageField } from "../step-forms/LanguageField";
 
-// Define schema with both languages
 const rentalSchema = z.object({
   name: z.string().min(2, "Название должно содержать минимум 2 символа"),
   name_ru: z.string().optional(),
@@ -40,7 +36,6 @@ interface RentalFormProps {
   isEditing?: boolean;
 }
 
-// Define the storage key for drafts
 const DRAFT_STORAGE_KEY = "rental-form-draft";
 
 export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormProps) => {
@@ -50,7 +45,6 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
   const navigate = useNavigate();
   const { t, language } = useTranslation();
 
-  // Initialize form
   const form = useForm<RentalFormData>({
     resolver: zodResolver(rentalSchema),
     defaultValues: {
@@ -69,7 +63,6 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
     },
   });
 
-  // Use custom hooks
   const { 
     imageUrl, 
     imageFile, 
@@ -79,7 +72,7 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
     uploadImage, 
     initializeImage,
     setImageUrl
-  } = useImageUpload("rentals"); // Specify "rentals" bucket explicitly
+  } = useImageUpload("rentals");
 
   const { saveDraft, loadDraft, clearDraft } = useFormDraft(
     DRAFT_STORAGE_KEY,
@@ -88,41 +81,27 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
     isEditing
   );
 
-  // Watch fields for validation
   const watchName = form.watch("name");
 
-  // Initialize imageUrl with initial data - FIX: Make sure this useEffect returns either nothing or a proper cleanup function
   useEffect(() => {
     if (initialData?.image_url) {
       initializeImage(initialData.image_url);
     }
-    // Return nothing or a proper cleanup function
-    return () => {
-      // Empty cleanup function
-    };
   }, [initialData]);
 
-  const handleFormSaveDraft = () => {
-    saveDraft(imageUrl);
-  };
-
-  const handleFormLoadDraft = () => {
-    loadDraft(setImageUrl);
-  };
+  const handleFormSaveDraft = () => saveDraft(imageUrl);
+  const handleFormLoadDraft = () => loadDraft(setImageUrl);
 
   const onSubmit = async () => {
     if (!user) return;
     
     setLoading(true);
     try {
-      // Get form data
       const data = form.getValues();
       
-      // Upload image if there's a new one
       let finalImageUrl = imageUrl;
       if (imageFile) {
         finalImageUrl = await uploadImage();
-        
         if (!finalImageUrl) {
           setLoading(false);
           return;
@@ -131,36 +110,24 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
 
       const rentalData = {
         ...data,
-        name: data.name, // Ensure name is explicitly set and not optional
+        name: data.name,
         image_url: finalImageUrl,
         owner_id: user.id,
       };
 
       if (isEditing) {
-        // Update existing rental
         const { error } = await supabase
           .from("rentals")
           .update(rentalData)
           .eq("id", initialData.id);
-
         if (error) throw error;
-
-        toast({
-          description: t("services.messages.updateSuccess"),
-        });
+        toast({ description: t("services.messages.updateSuccess") });
       } else {
-        // Create new rental
         const { error } = await supabase
           .from("rentals")
           .insert(rentalData);
-
         if (error) throw error;
-
-        toast({
-          description: t("services.messages.createSuccess"),
-        });
-        
-        // Clear draft after successful submission
+        toast({ description: t("services.messages.createSuccess") });
         clearDraft();
       }
 
@@ -176,193 +143,12 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
     }
   };
 
-  // Determine which language is alternate based on current language
   const alternateLanguage = language === "ky" ? "ru" : "ky";
+  const altNameField = `name_${alternateLanguage}` as "name_ru" | "name_kg";
+  const altDescField = `description_${alternateLanguage}` as "description_ru" | "description_kg";
+  const altPriceField = `price_${alternateLanguage}` as "price_ru" | "price_kg";
+  const altContactsField = `contacts_${alternateLanguage}` as "contacts_ru" | "contacts_kg";
 
-  // Define custom components for language tabs
-  const NameInput = () => {
-    const altLang = alternateLanguage;
-    const altLangField = `name_${altLang}` as "name_ru" | "name_kg";
-    
-    return (
-      <LanguageFormTabs
-        mainContent={
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.nameRental")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("services.fields.namePlaceholder")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateContent={
-          <FormField
-            control={form.control}
-            name={altLangField}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.nameRental")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("services.fields.namePlaceholder")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateLanguage={altLang}
-        description={t("services.language.form.description")}
-      />
-    );
-  };
-
-  const DescriptionInputTab = () => {
-    const altLang = alternateLanguage;
-    const altLangField = `description_${altLang}` as "description_ru" | "description_kg";
-    
-    return (
-      <LanguageFormTabs
-        mainContent={
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.description")}</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder={t("services.fields.descriptionRental")}
-                    className="min-h-[150px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateContent={
-          <FormField
-            control={form.control}
-            name={altLangField}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.description")}</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder={t("services.fields.descriptionRental")}
-                    className="min-h-[150px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateLanguage={altLang}
-        description={t("services.language.form.description")}
-      />
-    );
-  };
-  
-  const PriceInput = () => {
-    const altLang = alternateLanguage;
-    const altLangField = `price_${altLang}` as "price_ru" | "price_kg";
-    
-    return (
-      <LanguageFormTabs
-        mainContent={
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.price")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("services.fields.priceRentalExample")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateContent={
-          <FormField
-            control={form.control}
-            name={altLangField}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.price")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("services.fields.priceRentalExample")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateLanguage={altLang}
-      />
-    );
-  };
-
-  const ContactsInput = () => {
-    const altLang = alternateLanguage;
-    const altLangField = `contacts_${altLang}` as "contacts_ru" | "contacts_kg";
-    
-    return (
-      <LanguageFormTabs
-        mainContent={
-          <FormField
-            control={form.control}
-            name="contacts"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.contacts")}</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder={t("services.fields.contactsPlaceholder")}
-                    className="min-h-[100px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateContent={
-          <FormField
-            control={form.control}
-            name={altLangField}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("services.fields.contacts")}</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder={t("services.fields.contactsPlaceholder")}
-                    className="min-h-[100px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        }
-        alternateLanguage={altLang}
-      />
-    );
-  };
-
-  // Define steps
   const steps = [
     {
       id: "basic-info",
@@ -370,14 +156,22 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
       isValid: !!watchName,
       component: (
         <div className="space-y-4">
-          <NameInput />
+          <LanguageField
+            control={form.control}
+            mainName="name"
+            altName={altNameField}
+            label={t("services.fields.nameRental")}
+            placeholder={t("services.fields.namePlaceholder")}
+            alternateLanguage={alternateLanguage}
+            description={t("services.language.form.description")}
+          />
         </div>
       )
     },
     {
       id: "image",
       title: t("services.steps.images"),
-      isValid: true, // Image is optional
+      isValid: true,
       component: (
         <ImageStep
           imageUrl={imageUrl}
@@ -390,17 +184,44 @@ export const RentalStepForm = ({ initialData, isEditing = false }: RentalFormPro
     {
       id: "description",
       title: t("services.steps.description"),
-      isValid: true, // Description is optional
-      component: <DescriptionInputTab />
+      isValid: true,
+      component: (
+        <LanguageField
+          control={form.control}
+          mainName="description"
+          altName={altDescField}
+          label={t("services.fields.description")}
+          placeholder={t("services.fields.descriptionRental")}
+          alternateLanguage={alternateLanguage}
+          description={t("services.language.form.description")}
+          type="textarea"
+        />
+      )
     },
     {
       id: "contacts",
       title: t("services.steps.contacts"),
-      isValid: true, // Contacts are optional
+      isValid: true,
       component: (
         <div className="space-y-4">
-          <PriceInput />
-          <ContactsInput />
+          <LanguageField
+            control={form.control}
+            mainName="price"
+            altName={altPriceField}
+            label={t("services.fields.price")}
+            placeholder={t("services.fields.priceRentalExample")}
+            alternateLanguage={alternateLanguage}
+          />
+          <LanguageField
+            control={form.control}
+            mainName="contacts"
+            altName={altContactsField}
+            label={t("services.fields.contacts")}
+            placeholder={t("services.fields.contactsPlaceholder")}
+            alternateLanguage={alternateLanguage}
+            type="textarea"
+            textareaClassName="min-h-[100px]"
+          />
         </div>
       )
     }
